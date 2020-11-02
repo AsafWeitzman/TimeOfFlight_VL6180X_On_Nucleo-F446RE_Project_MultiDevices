@@ -1,0 +1,1940 @@
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"main.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.MX_GPIO_Init,"ax",%progbits
+  18              		.align	1
+  19              		.arch armv7e-m
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	MX_GPIO_Init:
+  26              	.LFB137:
+  27              		.file 1 "Src/main.c"
+   1:Src/main.c    **** /* USER CODE BEGIN Header */
+   2:Src/main.c    **** /**
+   3:Src/main.c    ****   ******************************************************************************
+   4:Src/main.c    ****   * @file           : main.c
+   5:Src/main.c    ****   * @brief          : Main program body
+   6:Src/main.c    ****   ******************************************************************************
+   7:Src/main.c    ****   * @attention
+   8:Src/main.c    ****   *
+   9:Src/main.c    ****   * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  10:Src/main.c    ****   * All rights reserved.</center></h2>
+  11:Src/main.c    ****   *
+  12:Src/main.c    ****   * This software component is licensed by ST under BSD 3-Clause license,
+  13:Src/main.c    ****   * the "License"; You may not use this file except in compliance with the
+  14:Src/main.c    ****   * License. You may obtain a copy of the License at:
+  15:Src/main.c    ****   *                        opensource.org/licenses/BSD-3-Clause
+  16:Src/main.c    ****   *
+  17:Src/main.c    ****   ******************************************************************************
+  18:Src/main.c    ****   */
+  19:Src/main.c    **** /* USER CODE END Header */
+  20:Src/main.c    **** 
+  21:Src/main.c    **** /* Includes ------------------------------------------------------------------*/
+  22:Src/main.c    **** #include "main.h"
+  23:Src/main.c    **** 
+  24:Src/main.c    **** /* Private includes ----------------------------------------------------------*/
+  25:Src/main.c    **** /* USER CODE BEGIN Includes */
+  26:Src/main.c    **** 
+  27:Src/main.c    **** /* USER CODE END Includes */
+  28:Src/main.c    **** 
+  29:Src/main.c    **** /* Private typedef -----------------------------------------------------------*/
+  30:Src/main.c    **** /* USER CODE BEGIN PTD */
+  31:Src/main.c    **** 
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 2
+
+
+  32:Src/main.c    **** /* USER CODE END PTD */
+  33:Src/main.c    **** 
+  34:Src/main.c    **** /* Private define ------------------------------------------------------------*/
+  35:Src/main.c    **** /* USER CODE BEGIN PD */
+  36:Src/main.c    **** #define DigitDisplay_ms     1 /* ms each digit is kept on */
+  37:Src/main.c    **** #define PressBPSwicthTime   1000 /* if user keep bp press more that this mean swicth mode else rool
+  38:Src/main.c    **** #define MAX_DEV 2
+  39:Src/main.c    **** 
+  40:Src/main.c    **** /* USER CODE END PD */
+  41:Src/main.c    **** 
+  42:Src/main.c    **** /* Private macro -------------------------------------------------------------*/
+  43:Src/main.c    **** /* USER CODE BEGIN PM */
+  44:Src/main.c    **** 
+  45:Src/main.c    **** /* USER CODE END PM */
+  46:Src/main.c    **** 
+  47:Src/main.c    **** /* Private variables ---------------------------------------------------------*/
+  48:Src/main.c    **** I2C_HandleTypeDef hi2c1;
+  49:Src/main.c    **** 
+  50:Src/main.c    **** UART_HandleTypeDef huart2;
+  51:Src/main.c    **** 
+  52:Src/main.c    **** /* USER CODE BEGIN PV */
+  53:Src/main.c    **** // global vars only for debugging with STMStudio
+  54:Src/main.c    **** VL6180x_RangeData_t Range[MAX_DEV];
+  55:Src/main.c    **** VL6180x_RangeData_t RangeDB1;
+  56:Src/main.c    **** VL6180x_RangeData_t RangeDB2;
+  57:Src/main.c    **** 
+  58:Src/main.c    **** /* USER CODE END PV */
+  59:Src/main.c    **** 
+  60:Src/main.c    **** /* Private function prototypes -----------------------------------------------*/
+  61:Src/main.c    **** void SystemClock_Config(void);
+  62:Src/main.c    **** static void MX_GPIO_Init(void);
+  63:Src/main.c    **** static void MX_I2C1_Init(void);
+  64:Src/main.c    **** static void MX_USART2_UART_Init(void);
+  65:Src/main.c    **** /* USER CODE BEGIN PFP */
+  66:Src/main.c    **** 
+  67:Src/main.c    **** /* USER CODE END PFP */
+  68:Src/main.c    **** 
+  69:Src/main.c    **** /* Private user code ---------------------------------------------------------*/
+  70:Src/main.c    **** /* USER CODE BEGIN 0 */
+  71:Src/main.c    **** 
+  72:Src/main.c    **** void WaitMilliSec(int ms);
+  73:Src/main.c    **** 
+  74:Src/main.c    **** VL6180xDev_t theVL6180xDev;
+  75:Src/main.c    **** struct MyVL6180Dev_t BoardDevs[MAX_DEV] = { 
+  76:Src/main.c    ****                                         [0]= { .DevID = 0 }, 
+  77:Src/main.c    ****                                         [1]= { .DevID = 1 }, 
+  78:Src/main.c    ****                                     };
+  79:Src/main.c    **** 
+  80:Src/main.c    **** VL6180xDev_t theVL6180xDev = &BoardDevs[0];
+  81:Src/main.c    **** 
+  82:Src/main.c    **** 
+  83:Src/main.c    **** /**
+  84:Src/main.c    ****  * VL6180x CubeMX F401 multiple device i2c implementation
+  85:Src/main.c    ****  */
+  86:Src/main.c    **** 
+  87:Src/main.c    **** #define i2c_bus      (&hi2c1)
+  88:Src/main.c    **** #define def_i2c_time_out 100
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 3
+
+
+  89:Src/main.c    **** 
+  90:Src/main.c    **** 
+  91:Src/main.c    **** int VL6180x_I2CWrite(VL6180xDev_t dev, uint8_t *buff, uint8_t len) {
+  92:Src/main.c    ****     int status;
+  93:Src/main.c    ****     status = HAL_I2C_Master_Transmit(i2c_bus, dev->I2cAddr, buff, len, def_i2c_time_out);
+  94:Src/main.c    ****     if (status) {
+  95:Src/main.c    ****         HAL_I2C_MspInit(&hi2c1);
+  96:Src/main.c    ****     }
+  97:Src/main.c    ****     return status? -1 : 0;
+  98:Src/main.c    **** }
+  99:Src/main.c    **** 
+ 100:Src/main.c    **** int VL6180x_I2CRead(VL6180xDev_t dev, uint8_t *buff, uint8_t len) {
+ 101:Src/main.c    ****     int status;
+ 102:Src/main.c    ****     status = HAL_I2C_Master_Receive(i2c_bus, dev->I2cAddr, buff, len, def_i2c_time_out);
+ 103:Src/main.c    ****     if (status) {
+ 104:Src/main.c    ****         HAL_I2C_MspInit(&hi2c1);
+ 105:Src/main.c    ****     }
+ 106:Src/main.c    **** 
+ 107:Src/main.c    ****     return status? -1 : 0;
+ 108:Src/main.c    **** }
+ 109:Src/main.c    **** 
+ 110:Src/main.c    **** void WaitMilliSec(int ms) {
+ 111:Src/main.c    ****     HAL_Delay(ms); /* it's milli sec  cos we do set systick to 1KHz */
+ 112:Src/main.c    **** }
+ 113:Src/main.c    **** 
+ 114:Src/main.c    **** 
+ 115:Src/main.c    **** 
+ 116:Src/main.c    **** /* USER CODE END 0 */
+ 117:Src/main.c    **** 
+ 118:Src/main.c    **** /**
+ 119:Src/main.c    ****   * @brief  The application entry point.
+ 120:Src/main.c    ****   * @retval int
+ 121:Src/main.c    ****   */
+ 122:Src/main.c    **** int main(void)
+ 123:Src/main.c    **** {
+ 124:Src/main.c    ****   /* USER CODE BEGIN 1 */
+ 125:Src/main.c    ****   
+ 126:Src/main.c    **** 
+ 127:Src/main.c    ****   int status;
+ 128:Src/main.c    ****   int i;
+ 129:Src/main.c    ****   int n_dev=2;
+ 130:Src/main.c    ****   int PresentDevMask;
+ 131:Src/main.c    ****   int nPresentDevs;
+ 132:Src/main.c    ****   int PresentDevIds[MAX_DEV];
+ 133:Src/main.c    ****   int nReady;
+ 134:Src/main.c    ****   /* USER CODE END 1 */
+ 135:Src/main.c    **** 
+ 136:Src/main.c    ****   /* MCU Configuration--------------------------------------------------------*/
+ 137:Src/main.c    **** 
+ 138:Src/main.c    ****   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+ 139:Src/main.c    ****   HAL_Init();
+ 140:Src/main.c    **** 
+ 141:Src/main.c    ****   /* USER CODE BEGIN Init */
+ 142:Src/main.c    **** 
+ 143:Src/main.c    ****   /* USER CODE END Init */
+ 144:Src/main.c    **** 
+ 145:Src/main.c    ****   /* Configure the system clock */
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 4
+
+
+ 146:Src/main.c    ****   SystemClock_Config();
+ 147:Src/main.c    **** 
+ 148:Src/main.c    ****   /* USER CODE BEGIN SysInit */
+ 149:Src/main.c    **** 
+ 150:Src/main.c    ****   /* USER CODE END SysInit */
+ 151:Src/main.c    **** 
+ 152:Src/main.c    ****   /* Initialize all configured peripherals */
+ 153:Src/main.c    ****   MX_GPIO_Init();
+ 154:Src/main.c    ****   MX_I2C1_Init();
+ 155:Src/main.c    ****   MX_USART2_UART_Init();
+ 156:Src/main.c    ****   /* USER CODE BEGIN 2 */
+ 157:Src/main.c    **** 
+ 158:Src/main.c    **** 
+ 159:Src/main.c    ****   /* detect presence and initialize devices i2c address  */
+ 160:Src/main.c    ****   /*set device i2c address for dev[i] = 0x52+(i+1)*2 */
+ 161:Src/main.c    ****   PresentDevMask = 0;
+ 162:Src/main.c    ****   nPresentDevs = 0;
+ 163:Src/main.c    ****   //strcpy(DisplayStr,"TLBR");
+ 164:Src/main.c    ****   for (i = 0; i <= n_dev - 1; i++) { //(i = n_dev - 1; i >= 0; i--)
+ 165:Src/main.c    ****       int FinalI2cAddr;
+ 166:Src/main.c    ****       uint8_t id;
+ 167:Src/main.c    ****       if (i==0)
+ 168:Src/main.c    ****         HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_11);
+ 169:Src/main.c    ****       if (i==1)
+ 170:Src/main.c    ****         HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_12);
+ 171:Src/main.c    ****         
+ 172:Src/main.c    ****       /* unreset device that wake up at default i2c addres 0x52 */
+ 173:Src/main.c    ****       WaitMilliSec(2);    /* at least 400usec before to acces device */
+ 174:Src/main.c    ****       BoardDevs[i].I2cAddr = 0x52;
+ 175:Src/main.c    ****       /* to detect device presence try to read it's dev id */
+ 176:Src/main.c    ****       status = VL6180x_RdByte(&BoardDevs[i], IDENTIFICATION_MODEL_ID, &id);
+ 177:Src/main.c    ****       if (status) {
+ 178:Src/main.c    ****           /* these device is not present skip init and clear it's letter on string */
+ 179:Src/main.c    ****           /*we can add here some debug prints*/
+ 180:Src/main.c    ****           //BoardDevs[i].Present = 0;
+ 181:Src/main.c    ****           //DisplayStr[i]=' ';
+ 182:Src/main.c    ****           continue;
+ 183:Src/main.c    ****       }
+ 184:Src/main.c    ****       /* device present only */
+ 185:Src/main.c    ****       BoardDevs[i].Present = 1;
+ 186:Src/main.c    ****       PresentDevMask |= 1 << i;
+ 187:Src/main.c    ****       PresentDevIds[nPresentDevs]=i;
+ 188:Src/main.c    ****       nPresentDevs++;
+ 189:Src/main.c    ****       status = VL6180x_InitData(&BoardDevs[i]);
+ 190:Src/main.c    **** 
+ 191:Src/main.c    ****       FinalI2cAddr = 0x52 + ((i+1) * 2);
+ 192:Src/main.c    ****       if (FinalI2cAddr != 0x52) {
+ 193:Src/main.c    ****           status = VL6180x_SetI2CAddress(&BoardDevs[i], FinalI2cAddr);
+ 194:Src/main.c    ****           if( status ){
+ 195:Src/main.c    ****               //HandleError("VL6180x_SetI2CAddress fail");
+ 196:Src/main.c    ****           }
+ 197:Src/main.c    ****           BoardDevs[i].I2cAddr = FinalI2cAddr;
+ 198:Src/main.c    ****       }
+ 199:Src/main.c    **** 
+ 200:Src/main.c    ****       WaitMilliSec(1);
+ 201:Src/main.c    ****       status = VL6180x_RdByte(&BoardDevs[i], IDENTIFICATION_MODEL_ID, &id);
+ 202:Src/main.c    ****       WaitMilliSec(1);
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 5
+
+
+ 203:Src/main.c    ****       status= VL6180x_Prepare(&BoardDevs[i]);
+ 204:Src/main.c    ****       if( status<0 ){
+ 205:Src/main.c    ****           //HandleError("VL6180x_Prepare fail");
+ 206:Src/main.c    ****       }
+ 207:Src/main.c    ****       /* Disable Dmax computation */
+ 208:Src/main.c    ****       VL6180x_DMaxSetState(&BoardDevs[i], 0);
+ 209:Src/main.c    **** 
+ 210:Src/main.c    ****     }
+ 211:Src/main.c    ****     HAL_Delay(30);
+ 212:Src/main.c    **** 
+ 213:Src/main.c    ****   /* USER CODE END 2 */
+ 214:Src/main.c    **** 
+ 215:Src/main.c    ****   /* Infinite loop */
+ 216:Src/main.c    ****   /* USER CODE BEGIN WHILE */
+ 217:Src/main.c    ****   while (1)
+ 218:Src/main.c    ****   {
+ 219:Src/main.c    ****     VL6180xDev_t dev;
+ 220:Src/main.c    ****     
+ 221:Src/main.c    ****     // kick off measure on all device 
+ 222:Src/main.c    ****     for( i=0; i<nPresentDevs; i++){
+ 223:Src/main.c    ****         dev =  BoardDevs + PresentDevIds[i];
+ 224:Src/main.c    ****         status = VL6180x_RangeStartSingleShot(dev);
+ 225:Src/main.c    ****         if( status<0 ){
+ 226:Src/main.c    ****             //TODO: print error : debug
+ 227:Src/main.c    ****         }
+ 228:Src/main.c    ****         dev->Ready=0;
+ 229:Src/main.c    ****     }
+ 230:Src/main.c    **** 
+ 231:Src/main.c    ****     // wait for all present device to have a measure  
+ 232:Src/main.c    ****     nReady=0;
+ 233:Src/main.c    ****     
+ 234:Src/main.c    ****     do{
+ 235:Src/main.c    ****         //DISP_ExecLoopBody();
+ 236:Src/main.c    ****         for( i=0; i<nPresentDevs; i++){
+ 237:Src/main.c    ****             dev =  BoardDevs + PresentDevIds[i];
+ 238:Src/main.c    ****             if( !dev->Ready ){
+ 239:Src/main.c    ****                 status = VL6180x_RangeGetMeasurementIfReady(dev, &Range[i]);
+ 240:Src/main.c    ****                 if (i==0)
+ 241:Src/main.c    ****                   RangeDB1 = Range[i];
+ 242:Src/main.c    ****                 if (i==1)
+ 243:Src/main.c    ****                   RangeDB2 = Range[i];
+ 244:Src/main.c    ****                 if( status == 0 ){
+ 245:Src/main.c    ****                     if(Range[i].errorStatus == DataNotReady)
+ 246:Src/main.c    ****                         continue;
+ 247:Src/main.c    ****                     // New measurement ready 
+ 248:Src/main.c    ****                     dev->Ready=1;
+ 249:Src/main.c    ****                     nReady++;
+ 250:Src/main.c    ****                 } else {
+ 251:Src/main.c    ****                     //HandleError("VL6180x_RangeStartSingleShot fail"); //TODO: print error : debug
+ 252:Src/main.c    ****                 }
+ 253:Src/main.c    ****             }
+ 254:Src/main.c    ****         }
+ 255:Src/main.c    ****     }
+ 256:Src/main.c    ****     while( nReady<nPresentDevs);
+ 257:Src/main.c    ****     
+ 258:Src/main.c    ****     HAL_Delay(10);
+ 259:Src/main.c    ****       
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 6
+
+
+ 260:Src/main.c    ****     /* USER CODE END WHILE */
+ 261:Src/main.c    ****    
+ 262:Src/main.c    ****     
+ 263:Src/main.c    ****     /* USER CODE BEGIN 3 */
+ 264:Src/main.c    ****   }
+ 265:Src/main.c    ****   /* USER CODE END 3 */
+ 266:Src/main.c    **** }
+ 267:Src/main.c    **** 
+ 268:Src/main.c    **** /**
+ 269:Src/main.c    ****   * @brief System Clock Configuration
+ 270:Src/main.c    ****   * @retval None
+ 271:Src/main.c    ****   */
+ 272:Src/main.c    **** void SystemClock_Config(void)
+ 273:Src/main.c    **** {
+ 274:Src/main.c    ****   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+ 275:Src/main.c    ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 276:Src/main.c    **** 
+ 277:Src/main.c    ****   /** Configure the main internal regulator output voltage 
+ 278:Src/main.c    ****   */
+ 279:Src/main.c    ****   __HAL_RCC_PWR_CLK_ENABLE();
+ 280:Src/main.c    ****   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+ 281:Src/main.c    ****   /** Initializes the CPU, AHB and APB busses clocks 
+ 282:Src/main.c    ****   */
+ 283:Src/main.c    ****   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+ 284:Src/main.c    ****   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+ 285:Src/main.c    ****   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+ 286:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+ 287:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+ 288:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLM = 16;
+ 289:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLN = 336;
+ 290:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+ 291:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLQ = 2;
+ 292:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLR = 2;
+ 293:Src/main.c    ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+ 294:Src/main.c    ****   {
+ 295:Src/main.c    ****     Error_Handler();
+ 296:Src/main.c    ****   }
+ 297:Src/main.c    ****   /** Initializes the CPU, AHB and APB busses clocks 
+ 298:Src/main.c    ****   */
+ 299:Src/main.c    ****   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+ 300:Src/main.c    ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 301:Src/main.c    ****   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+ 302:Src/main.c    ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 303:Src/main.c    ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+ 304:Src/main.c    ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 305:Src/main.c    **** 
+ 306:Src/main.c    ****   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+ 307:Src/main.c    ****   {
+ 308:Src/main.c    ****     Error_Handler();
+ 309:Src/main.c    ****   }
+ 310:Src/main.c    **** }
+ 311:Src/main.c    **** 
+ 312:Src/main.c    **** /**
+ 313:Src/main.c    ****   * @brief I2C1 Initialization Function
+ 314:Src/main.c    ****   * @param None
+ 315:Src/main.c    ****   * @retval None
+ 316:Src/main.c    ****   */
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 7
+
+
+ 317:Src/main.c    **** static void MX_I2C1_Init(void)
+ 318:Src/main.c    **** {
+ 319:Src/main.c    **** 
+ 320:Src/main.c    ****   /* USER CODE BEGIN I2C1_Init 0 */
+ 321:Src/main.c    **** 
+ 322:Src/main.c    ****   /* USER CODE END I2C1_Init 0 */
+ 323:Src/main.c    **** 
+ 324:Src/main.c    ****   /* USER CODE BEGIN I2C1_Init 1 */
+ 325:Src/main.c    **** 
+ 326:Src/main.c    ****   /* USER CODE END I2C1_Init 1 */
+ 327:Src/main.c    ****   hi2c1.Instance = I2C1;
+ 328:Src/main.c    ****   hi2c1.Init.ClockSpeed = 100000;
+ 329:Src/main.c    ****   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+ 330:Src/main.c    ****   hi2c1.Init.OwnAddress1 = 0;
+ 331:Src/main.c    ****   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+ 332:Src/main.c    ****   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+ 333:Src/main.c    ****   hi2c1.Init.OwnAddress2 = 0;
+ 334:Src/main.c    ****   hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+ 335:Src/main.c    ****   hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+ 336:Src/main.c    ****   if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+ 337:Src/main.c    ****   {
+ 338:Src/main.c    ****     Error_Handler();
+ 339:Src/main.c    ****   }
+ 340:Src/main.c    ****   /* USER CODE BEGIN I2C1_Init 2 */
+ 341:Src/main.c    **** 
+ 342:Src/main.c    ****   /* USER CODE END I2C1_Init 2 */
+ 343:Src/main.c    **** 
+ 344:Src/main.c    **** }
+ 345:Src/main.c    **** 
+ 346:Src/main.c    **** /**
+ 347:Src/main.c    ****   * @brief USART2 Initialization Function
+ 348:Src/main.c    ****   * @param None
+ 349:Src/main.c    ****   * @retval None
+ 350:Src/main.c    ****   */
+ 351:Src/main.c    **** static void MX_USART2_UART_Init(void)
+ 352:Src/main.c    **** {
+ 353:Src/main.c    **** 
+ 354:Src/main.c    ****   /* USER CODE BEGIN USART2_Init 0 */
+ 355:Src/main.c    **** 
+ 356:Src/main.c    ****   /* USER CODE END USART2_Init 0 */
+ 357:Src/main.c    **** 
+ 358:Src/main.c    ****   /* USER CODE BEGIN USART2_Init 1 */
+ 359:Src/main.c    **** 
+ 360:Src/main.c    ****   /* USER CODE END USART2_Init 1 */
+ 361:Src/main.c    ****   huart2.Instance = USART2;
+ 362:Src/main.c    ****   huart2.Init.BaudRate = 115200;
+ 363:Src/main.c    ****   huart2.Init.WordLength = UART_WORDLENGTH_8B;
+ 364:Src/main.c    ****   huart2.Init.StopBits = UART_STOPBITS_1;
+ 365:Src/main.c    ****   huart2.Init.Parity = UART_PARITY_NONE;
+ 366:Src/main.c    ****   huart2.Init.Mode = UART_MODE_TX_RX;
+ 367:Src/main.c    ****   huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+ 368:Src/main.c    ****   huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+ 369:Src/main.c    ****   if (HAL_UART_Init(&huart2) != HAL_OK)
+ 370:Src/main.c    ****   {
+ 371:Src/main.c    ****     Error_Handler();
+ 372:Src/main.c    ****   }
+ 373:Src/main.c    ****   /* USER CODE BEGIN USART2_Init 2 */
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 8
+
+
+ 374:Src/main.c    **** 
+ 375:Src/main.c    ****   /* USER CODE END USART2_Init 2 */
+ 376:Src/main.c    **** 
+ 377:Src/main.c    **** }
+ 378:Src/main.c    **** 
+ 379:Src/main.c    **** /**
+ 380:Src/main.c    ****   * @brief GPIO Initialization Function
+ 381:Src/main.c    ****   * @param None
+ 382:Src/main.c    ****   * @retval None
+ 383:Src/main.c    ****   */
+ 384:Src/main.c    **** static void MX_GPIO_Init(void)
+ 385:Src/main.c    **** {
+  28              		.loc 1 385 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 40
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 30B5     		push	{r4, r5, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 12
+  35              		.cfi_offset 4, -12
+  36              		.cfi_offset 5, -8
+  37              		.cfi_offset 14, -4
+  38 0002 8BB0     		sub	sp, sp, #44
+  39              	.LCFI1:
+  40              		.cfi_def_cfa_offset 56
+ 386:Src/main.c    ****   GPIO_InitTypeDef GPIO_InitStruct = {0};
+  41              		.loc 1 386 3 view .LVU1
+  42              		.loc 1 386 20 is_stmt 0 view .LVU2
+  43 0004 0024     		movs	r4, #0
+  44 0006 0594     		str	r4, [sp, #20]
+  45 0008 0694     		str	r4, [sp, #24]
+  46 000a 0794     		str	r4, [sp, #28]
+  47 000c 0894     		str	r4, [sp, #32]
+  48 000e 0994     		str	r4, [sp, #36]
+ 387:Src/main.c    **** 
+ 388:Src/main.c    ****   /* GPIO Ports Clock Enable */
+ 389:Src/main.c    ****   __HAL_RCC_GPIOC_CLK_ENABLE();
+  49              		.loc 1 389 3 is_stmt 1 view .LVU3
+  50              	.LBB2:
+  51              		.loc 1 389 3 view .LVU4
+  52 0010 0194     		str	r4, [sp, #4]
+  53              		.loc 1 389 3 view .LVU5
+  54 0012 234B     		ldr	r3, .L3
+  55 0014 1A6B     		ldr	r2, [r3, #48]
+  56 0016 42F00402 		orr	r2, r2, #4
+  57 001a 1A63     		str	r2, [r3, #48]
+  58              		.loc 1 389 3 view .LVU6
+  59 001c 1A6B     		ldr	r2, [r3, #48]
+  60 001e 02F00402 		and	r2, r2, #4
+  61 0022 0192     		str	r2, [sp, #4]
+  62              		.loc 1 389 3 view .LVU7
+  63 0024 019A     		ldr	r2, [sp, #4]
+  64              	.LBE2:
+  65              		.loc 1 389 3 view .LVU8
+ 390:Src/main.c    ****   __HAL_RCC_GPIOH_CLK_ENABLE();
+  66              		.loc 1 390 3 view .LVU9
+  67              	.LBB3:
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 9
+
+
+  68              		.loc 1 390 3 view .LVU10
+  69 0026 0294     		str	r4, [sp, #8]
+  70              		.loc 1 390 3 view .LVU11
+  71 0028 1A6B     		ldr	r2, [r3, #48]
+  72 002a 42F08002 		orr	r2, r2, #128
+  73 002e 1A63     		str	r2, [r3, #48]
+  74              		.loc 1 390 3 view .LVU12
+  75 0030 1A6B     		ldr	r2, [r3, #48]
+  76 0032 02F08002 		and	r2, r2, #128
+  77 0036 0292     		str	r2, [sp, #8]
+  78              		.loc 1 390 3 view .LVU13
+  79 0038 029A     		ldr	r2, [sp, #8]
+  80              	.LBE3:
+  81              		.loc 1 390 3 view .LVU14
+ 391:Src/main.c    ****   __HAL_RCC_GPIOA_CLK_ENABLE();
+  82              		.loc 1 391 3 view .LVU15
+  83              	.LBB4:
+  84              		.loc 1 391 3 view .LVU16
+  85 003a 0394     		str	r4, [sp, #12]
+  86              		.loc 1 391 3 view .LVU17
+  87 003c 1A6B     		ldr	r2, [r3, #48]
+  88 003e 42F00102 		orr	r2, r2, #1
+  89 0042 1A63     		str	r2, [r3, #48]
+  90              		.loc 1 391 3 view .LVU18
+  91 0044 1A6B     		ldr	r2, [r3, #48]
+  92 0046 02F00102 		and	r2, r2, #1
+  93 004a 0392     		str	r2, [sp, #12]
+  94              		.loc 1 391 3 view .LVU19
+  95 004c 039A     		ldr	r2, [sp, #12]
+  96              	.LBE4:
+  97              		.loc 1 391 3 view .LVU20
+ 392:Src/main.c    ****   __HAL_RCC_GPIOB_CLK_ENABLE();
+  98              		.loc 1 392 3 view .LVU21
+  99              	.LBB5:
+ 100              		.loc 1 392 3 view .LVU22
+ 101 004e 0494     		str	r4, [sp, #16]
+ 102              		.loc 1 392 3 view .LVU23
+ 103 0050 1A6B     		ldr	r2, [r3, #48]
+ 104 0052 42F00202 		orr	r2, r2, #2
+ 105 0056 1A63     		str	r2, [r3, #48]
+ 106              		.loc 1 392 3 view .LVU24
+ 107 0058 1B6B     		ldr	r3, [r3, #48]
+ 108 005a 03F00203 		and	r3, r3, #2
+ 109 005e 0493     		str	r3, [sp, #16]
+ 110              		.loc 1 392 3 view .LVU25
+ 111 0060 049B     		ldr	r3, [sp, #16]
+ 112              	.LBE5:
+ 113              		.loc 1 392 3 view .LVU26
+ 393:Src/main.c    **** 
+ 394:Src/main.c    ****   /*Configure GPIO pin Output Level */
+ 395:Src/main.c    ****   HAL_GPIO_WritePin(GPIOA, LD2_Pin|GPIO_PIN_11|GPIO_PIN_12, GPIO_PIN_RESET);
+ 114              		.loc 1 395 3 view .LVU27
+ 115 0062 104D     		ldr	r5, .L3+4
+ 116 0064 2246     		mov	r2, r4
+ 117 0066 4FF4C151 		mov	r1, #6176
+ 118 006a 2846     		mov	r0, r5
+ 119 006c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 10
+
+
+ 120              	.LVL0:
+ 396:Src/main.c    **** 
+ 397:Src/main.c    ****   /*Configure GPIO pin : B1_Pin */
+ 398:Src/main.c    ****   GPIO_InitStruct.Pin = B1_Pin;
+ 121              		.loc 1 398 3 view .LVU28
+ 122              		.loc 1 398 23 is_stmt 0 view .LVU29
+ 123 0070 4FF40053 		mov	r3, #8192
+ 124 0074 0593     		str	r3, [sp, #20]
+ 399:Src/main.c    ****   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+ 125              		.loc 1 399 3 is_stmt 1 view .LVU30
+ 126              		.loc 1 399 24 is_stmt 0 view .LVU31
+ 127 0076 0C4B     		ldr	r3, .L3+8
+ 128 0078 0693     		str	r3, [sp, #24]
+ 400:Src/main.c    ****   GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 129              		.loc 1 400 3 is_stmt 1 view .LVU32
+ 130              		.loc 1 400 24 is_stmt 0 view .LVU33
+ 131 007a 0794     		str	r4, [sp, #28]
+ 401:Src/main.c    ****   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+ 132              		.loc 1 401 3 is_stmt 1 view .LVU34
+ 133 007c 05A9     		add	r1, sp, #20
+ 134 007e 0B48     		ldr	r0, .L3+12
+ 135 0080 FFF7FEFF 		bl	HAL_GPIO_Init
+ 136              	.LVL1:
+ 402:Src/main.c    **** 
+ 403:Src/main.c    ****   /*Configure GPIO pins : LD2_Pin PA11 PA12 */
+ 404:Src/main.c    ****   GPIO_InitStruct.Pin = LD2_Pin|GPIO_PIN_11|GPIO_PIN_12;
+ 137              		.loc 1 404 3 view .LVU35
+ 138              		.loc 1 404 23 is_stmt 0 view .LVU36
+ 139 0084 4FF4C153 		mov	r3, #6176
+ 140 0088 0593     		str	r3, [sp, #20]
+ 405:Src/main.c    ****   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+ 141              		.loc 1 405 3 is_stmt 1 view .LVU37
+ 142              		.loc 1 405 24 is_stmt 0 view .LVU38
+ 143 008a 0123     		movs	r3, #1
+ 144 008c 0693     		str	r3, [sp, #24]
+ 406:Src/main.c    ****   GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 145              		.loc 1 406 3 is_stmt 1 view .LVU39
+ 146              		.loc 1 406 24 is_stmt 0 view .LVU40
+ 147 008e 0794     		str	r4, [sp, #28]
+ 407:Src/main.c    ****   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 148              		.loc 1 407 3 is_stmt 1 view .LVU41
+ 149              		.loc 1 407 25 is_stmt 0 view .LVU42
+ 150 0090 0894     		str	r4, [sp, #32]
+ 408:Src/main.c    ****   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+ 151              		.loc 1 408 3 is_stmt 1 view .LVU43
+ 152 0092 05A9     		add	r1, sp, #20
+ 153 0094 2846     		mov	r0, r5
+ 154 0096 FFF7FEFF 		bl	HAL_GPIO_Init
+ 155              	.LVL2:
+ 409:Src/main.c    **** 
+ 410:Src/main.c    **** }
+ 156              		.loc 1 410 1 is_stmt 0 view .LVU44
+ 157 009a 0BB0     		add	sp, sp, #44
+ 158              	.LCFI2:
+ 159              		.cfi_def_cfa_offset 12
+ 160              		@ sp needed
+ 161 009c 30BD     		pop	{r4, r5, pc}
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 11
+
+
+ 162              	.L4:
+ 163 009e 00BF     		.align	2
+ 164              	.L3:
+ 165 00a0 00380240 		.word	1073887232
+ 166 00a4 00000240 		.word	1073872896
+ 167 00a8 00002110 		.word	270598144
+ 168 00ac 00080240 		.word	1073874944
+ 169              		.cfi_endproc
+ 170              	.LFE137:
+ 172              		.section	.text.MX_I2C1_Init,"ax",%progbits
+ 173              		.align	1
+ 174              		.syntax unified
+ 175              		.thumb
+ 176              		.thumb_func
+ 177              		.fpu fpv4-sp-d16
+ 179              	MX_I2C1_Init:
+ 180              	.LFB135:
+ 318:Src/main.c    **** 
+ 181              		.loc 1 318 1 is_stmt 1 view -0
+ 182              		.cfi_startproc
+ 183              		@ args = 0, pretend = 0, frame = 0
+ 184              		@ frame_needed = 0, uses_anonymous_args = 0
+ 185 0000 08B5     		push	{r3, lr}
+ 186              	.LCFI3:
+ 187              		.cfi_def_cfa_offset 8
+ 188              		.cfi_offset 3, -8
+ 189              		.cfi_offset 14, -4
+ 327:Src/main.c    ****   hi2c1.Init.ClockSpeed = 100000;
+ 190              		.loc 1 327 3 view .LVU46
+ 327:Src/main.c    ****   hi2c1.Init.ClockSpeed = 100000;
+ 191              		.loc 1 327 18 is_stmt 0 view .LVU47
+ 192 0002 0948     		ldr	r0, .L7
+ 193 0004 094B     		ldr	r3, .L7+4
+ 194 0006 0360     		str	r3, [r0]
+ 328:Src/main.c    ****   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+ 195              		.loc 1 328 3 is_stmt 1 view .LVU48
+ 328:Src/main.c    ****   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+ 196              		.loc 1 328 25 is_stmt 0 view .LVU49
+ 197 0008 094B     		ldr	r3, .L7+8
+ 198 000a 4360     		str	r3, [r0, #4]
+ 329:Src/main.c    ****   hi2c1.Init.OwnAddress1 = 0;
+ 199              		.loc 1 329 3 is_stmt 1 view .LVU50
+ 329:Src/main.c    ****   hi2c1.Init.OwnAddress1 = 0;
+ 200              		.loc 1 329 24 is_stmt 0 view .LVU51
+ 201 000c 0023     		movs	r3, #0
+ 202 000e 8360     		str	r3, [r0, #8]
+ 330:Src/main.c    ****   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+ 203              		.loc 1 330 3 is_stmt 1 view .LVU52
+ 330:Src/main.c    ****   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+ 204              		.loc 1 330 26 is_stmt 0 view .LVU53
+ 205 0010 C360     		str	r3, [r0, #12]
+ 331:Src/main.c    ****   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+ 206              		.loc 1 331 3 is_stmt 1 view .LVU54
+ 331:Src/main.c    ****   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+ 207              		.loc 1 331 29 is_stmt 0 view .LVU55
+ 208 0012 4FF48042 		mov	r2, #16384
+ 209 0016 0261     		str	r2, [r0, #16]
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 12
+
+
+ 332:Src/main.c    ****   hi2c1.Init.OwnAddress2 = 0;
+ 210              		.loc 1 332 3 is_stmt 1 view .LVU56
+ 332:Src/main.c    ****   hi2c1.Init.OwnAddress2 = 0;
+ 211              		.loc 1 332 30 is_stmt 0 view .LVU57
+ 212 0018 4361     		str	r3, [r0, #20]
+ 333:Src/main.c    ****   hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+ 213              		.loc 1 333 3 is_stmt 1 view .LVU58
+ 333:Src/main.c    ****   hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+ 214              		.loc 1 333 26 is_stmt 0 view .LVU59
+ 215 001a 8361     		str	r3, [r0, #24]
+ 334:Src/main.c    ****   hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+ 216              		.loc 1 334 3 is_stmt 1 view .LVU60
+ 334:Src/main.c    ****   hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+ 217              		.loc 1 334 30 is_stmt 0 view .LVU61
+ 218 001c C361     		str	r3, [r0, #28]
+ 335:Src/main.c    ****   if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+ 219              		.loc 1 335 3 is_stmt 1 view .LVU62
+ 335:Src/main.c    ****   if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+ 220              		.loc 1 335 28 is_stmt 0 view .LVU63
+ 221 001e 0362     		str	r3, [r0, #32]
+ 336:Src/main.c    ****   {
+ 222              		.loc 1 336 3 is_stmt 1 view .LVU64
+ 336:Src/main.c    ****   {
+ 223              		.loc 1 336 7 is_stmt 0 view .LVU65
+ 224 0020 FFF7FEFF 		bl	HAL_I2C_Init
+ 225              	.LVL3:
+ 344:Src/main.c    **** 
+ 226              		.loc 1 344 1 view .LVU66
+ 227 0024 08BD     		pop	{r3, pc}
+ 228              	.L8:
+ 229 0026 00BF     		.align	2
+ 230              	.L7:
+ 231 0028 00000000 		.word	hi2c1
+ 232 002c 00540040 		.word	1073763328
+ 233 0030 A0860100 		.word	100000
+ 234              		.cfi_endproc
+ 235              	.LFE135:
+ 237              		.section	.text.MX_USART2_UART_Init,"ax",%progbits
+ 238              		.align	1
+ 239              		.syntax unified
+ 240              		.thumb
+ 241              		.thumb_func
+ 242              		.fpu fpv4-sp-d16
+ 244              	MX_USART2_UART_Init:
+ 245              	.LFB136:
+ 352:Src/main.c    **** 
+ 246              		.loc 1 352 1 is_stmt 1 view -0
+ 247              		.cfi_startproc
+ 248              		@ args = 0, pretend = 0, frame = 0
+ 249              		@ frame_needed = 0, uses_anonymous_args = 0
+ 250 0000 08B5     		push	{r3, lr}
+ 251              	.LCFI4:
+ 252              		.cfi_def_cfa_offset 8
+ 253              		.cfi_offset 3, -8
+ 254              		.cfi_offset 14, -4
+ 361:Src/main.c    ****   huart2.Init.BaudRate = 115200;
+ 255              		.loc 1 361 3 view .LVU68
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 13
+
+
+ 361:Src/main.c    ****   huart2.Init.BaudRate = 115200;
+ 256              		.loc 1 361 19 is_stmt 0 view .LVU69
+ 257 0002 0848     		ldr	r0, .L11
+ 258 0004 084B     		ldr	r3, .L11+4
+ 259 0006 0360     		str	r3, [r0]
+ 362:Src/main.c    ****   huart2.Init.WordLength = UART_WORDLENGTH_8B;
+ 260              		.loc 1 362 3 is_stmt 1 view .LVU70
+ 362:Src/main.c    ****   huart2.Init.WordLength = UART_WORDLENGTH_8B;
+ 261              		.loc 1 362 24 is_stmt 0 view .LVU71
+ 262 0008 4FF4E133 		mov	r3, #115200
+ 263 000c 4360     		str	r3, [r0, #4]
+ 363:Src/main.c    ****   huart2.Init.StopBits = UART_STOPBITS_1;
+ 264              		.loc 1 363 3 is_stmt 1 view .LVU72
+ 363:Src/main.c    ****   huart2.Init.StopBits = UART_STOPBITS_1;
+ 265              		.loc 1 363 26 is_stmt 0 view .LVU73
+ 266 000e 0023     		movs	r3, #0
+ 267 0010 8360     		str	r3, [r0, #8]
+ 364:Src/main.c    ****   huart2.Init.Parity = UART_PARITY_NONE;
+ 268              		.loc 1 364 3 is_stmt 1 view .LVU74
+ 364:Src/main.c    ****   huart2.Init.Parity = UART_PARITY_NONE;
+ 269              		.loc 1 364 24 is_stmt 0 view .LVU75
+ 270 0012 C360     		str	r3, [r0, #12]
+ 365:Src/main.c    ****   huart2.Init.Mode = UART_MODE_TX_RX;
+ 271              		.loc 1 365 3 is_stmt 1 view .LVU76
+ 365:Src/main.c    ****   huart2.Init.Mode = UART_MODE_TX_RX;
+ 272              		.loc 1 365 22 is_stmt 0 view .LVU77
+ 273 0014 0361     		str	r3, [r0, #16]
+ 366:Src/main.c    ****   huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+ 274              		.loc 1 366 3 is_stmt 1 view .LVU78
+ 366:Src/main.c    ****   huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+ 275              		.loc 1 366 20 is_stmt 0 view .LVU79
+ 276 0016 0C22     		movs	r2, #12
+ 277 0018 4261     		str	r2, [r0, #20]
+ 367:Src/main.c    ****   huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+ 278              		.loc 1 367 3 is_stmt 1 view .LVU80
+ 367:Src/main.c    ****   huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+ 279              		.loc 1 367 25 is_stmt 0 view .LVU81
+ 280 001a 8361     		str	r3, [r0, #24]
+ 368:Src/main.c    ****   if (HAL_UART_Init(&huart2) != HAL_OK)
+ 281              		.loc 1 368 3 is_stmt 1 view .LVU82
+ 368:Src/main.c    ****   if (HAL_UART_Init(&huart2) != HAL_OK)
+ 282              		.loc 1 368 28 is_stmt 0 view .LVU83
+ 283 001c C361     		str	r3, [r0, #28]
+ 369:Src/main.c    ****   {
+ 284              		.loc 1 369 3 is_stmt 1 view .LVU84
+ 369:Src/main.c    ****   {
+ 285              		.loc 1 369 7 is_stmt 0 view .LVU85
+ 286 001e FFF7FEFF 		bl	HAL_UART_Init
+ 287              	.LVL4:
+ 377:Src/main.c    **** 
+ 288              		.loc 1 377 1 view .LVU86
+ 289 0022 08BD     		pop	{r3, pc}
+ 290              	.L12:
+ 291              		.align	2
+ 292              	.L11:
+ 293 0024 00000000 		.word	huart2
+ 294 0028 00440040 		.word	1073759232
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 14
+
+
+ 295              		.cfi_endproc
+ 296              	.LFE136:
+ 298              		.section	.text.VL6180x_I2CWrite,"ax",%progbits
+ 299              		.align	1
+ 300              		.global	VL6180x_I2CWrite
+ 301              		.syntax unified
+ 302              		.thumb
+ 303              		.thumb_func
+ 304              		.fpu fpv4-sp-d16
+ 306              	VL6180x_I2CWrite:
+ 307              	.LVL5:
+ 308              	.LFB130:
+  91:Src/main.c    ****     int status;
+ 309              		.loc 1 91 68 is_stmt 1 view -0
+ 310              		.cfi_startproc
+ 311              		@ args = 0, pretend = 0, frame = 0
+ 312              		@ frame_needed = 0, uses_anonymous_args = 0
+  91:Src/main.c    ****     int status;
+ 313              		.loc 1 91 68 is_stmt 0 view .LVU88
+ 314 0000 30B5     		push	{r4, r5, lr}
+ 315              	.LCFI5:
+ 316              		.cfi_def_cfa_offset 12
+ 317              		.cfi_offset 4, -12
+ 318              		.cfi_offset 5, -8
+ 319              		.cfi_offset 14, -4
+ 320 0002 83B0     		sub	sp, sp, #12
+ 321              	.LCFI6:
+ 322              		.cfi_def_cfa_offset 24
+ 323 0004 0C46     		mov	r4, r1
+ 324 0006 1346     		mov	r3, r2
+  92:Src/main.c    ****     status = HAL_I2C_Master_Transmit(i2c_bus, dev->I2cAddr, buff, len, def_i2c_time_out);
+ 325              		.loc 1 92 5 is_stmt 1 view .LVU89
+  93:Src/main.c    ****     if (status) {
+ 326              		.loc 1 93 5 view .LVU90
+  93:Src/main.c    ****     if (status) {
+ 327              		.loc 1 93 14 is_stmt 0 view .LVU91
+ 328 0008 90F8D010 		ldrb	r1, [r0, #208]	@ zero_extendqisi2
+ 329              	.LVL6:
+  93:Src/main.c    ****     if (status) {
+ 330              		.loc 1 93 14 view .LVU92
+ 331 000c 6422     		movs	r2, #100
+ 332              	.LVL7:
+  93:Src/main.c    ****     if (status) {
+ 333              		.loc 1 93 14 view .LVU93
+ 334 000e 0092     		str	r2, [sp]
+ 335 0010 2246     		mov	r2, r4
+ 336 0012 0848     		ldr	r0, .L19
+ 337              	.LVL8:
+  93:Src/main.c    ****     if (status) {
+ 338              		.loc 1 93 14 view .LVU94
+ 339 0014 FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+ 340              	.LVL9:
+ 341 0018 0446     		mov	r4, r0
+ 342              	.LVL10:
+  93:Src/main.c    ****     if (status) {
+ 343              		.loc 1 93 12 view .LVU95
+ 344 001a 0546     		mov	r5, r0
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 15
+
+
+ 345              	.LVL11:
+  94:Src/main.c    ****         HAL_I2C_MspInit(&hi2c1);
+ 346              		.loc 1 94 5 is_stmt 1 view .LVU96
+  94:Src/main.c    ****         HAL_I2C_MspInit(&hi2c1);
+ 347              		.loc 1 94 8 is_stmt 0 view .LVU97
+ 348 001c 18B9     		cbnz	r0, .L17
+ 349              	.LVL12:
+ 350              	.L14:
+  97:Src/main.c    **** }
+ 351              		.loc 1 97 5 is_stmt 1 view .LVU98
+  97:Src/main.c    **** }
+ 352              		.loc 1 97 23 is_stmt 0 view .LVU99
+ 353 001e 34B9     		cbnz	r4, .L18
+ 354              	.L13:
+  98:Src/main.c    **** 
+ 355              		.loc 1 98 1 view .LVU100
+ 356 0020 2846     		mov	r0, r5
+ 357 0022 03B0     		add	sp, sp, #12
+ 358              	.LCFI7:
+ 359              		.cfi_remember_state
+ 360              		.cfi_def_cfa_offset 12
+ 361              		@ sp needed
+ 362 0024 30BD     		pop	{r4, r5, pc}
+ 363              	.LVL13:
+ 364              	.L17:
+ 365              	.LCFI8:
+ 366              		.cfi_restore_state
+  95:Src/main.c    ****     }
+ 367              		.loc 1 95 9 is_stmt 1 view .LVU101
+ 368 0026 0348     		ldr	r0, .L19
+ 369              	.LVL14:
+  95:Src/main.c    ****     }
+ 370              		.loc 1 95 9 is_stmt 0 view .LVU102
+ 371 0028 FFF7FEFF 		bl	HAL_I2C_MspInit
+ 372              	.LVL15:
+ 373 002c F7E7     		b	.L14
+ 374              	.L18:
+  97:Src/main.c    **** }
+ 375              		.loc 1 97 23 view .LVU103
+ 376 002e 4FF0FF35 		mov	r5, #-1
+ 377 0032 F5E7     		b	.L13
+ 378              	.L20:
+ 379              		.align	2
+ 380              	.L19:
+ 381 0034 00000000 		.word	hi2c1
+ 382              		.cfi_endproc
+ 383              	.LFE130:
+ 385              		.section	.text.VL6180x_I2CRead,"ax",%progbits
+ 386              		.align	1
+ 387              		.global	VL6180x_I2CRead
+ 388              		.syntax unified
+ 389              		.thumb
+ 390              		.thumb_func
+ 391              		.fpu fpv4-sp-d16
+ 393              	VL6180x_I2CRead:
+ 394              	.LVL16:
+ 395              	.LFB131:
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 16
+
+
+ 100:Src/main.c    ****     int status;
+ 396              		.loc 1 100 67 is_stmt 1 view -0
+ 397              		.cfi_startproc
+ 398              		@ args = 0, pretend = 0, frame = 0
+ 399              		@ frame_needed = 0, uses_anonymous_args = 0
+ 100:Src/main.c    ****     int status;
+ 400              		.loc 1 100 67 is_stmt 0 view .LVU105
+ 401 0000 30B5     		push	{r4, r5, lr}
+ 402              	.LCFI9:
+ 403              		.cfi_def_cfa_offset 12
+ 404              		.cfi_offset 4, -12
+ 405              		.cfi_offset 5, -8
+ 406              		.cfi_offset 14, -4
+ 407 0002 83B0     		sub	sp, sp, #12
+ 408              	.LCFI10:
+ 409              		.cfi_def_cfa_offset 24
+ 410 0004 0C46     		mov	r4, r1
+ 411 0006 1346     		mov	r3, r2
+ 101:Src/main.c    ****     status = HAL_I2C_Master_Receive(i2c_bus, dev->I2cAddr, buff, len, def_i2c_time_out);
+ 412              		.loc 1 101 5 is_stmt 1 view .LVU106
+ 102:Src/main.c    ****     if (status) {
+ 413              		.loc 1 102 5 view .LVU107
+ 102:Src/main.c    ****     if (status) {
+ 414              		.loc 1 102 14 is_stmt 0 view .LVU108
+ 415 0008 90F8D010 		ldrb	r1, [r0, #208]	@ zero_extendqisi2
+ 416              	.LVL17:
+ 102:Src/main.c    ****     if (status) {
+ 417              		.loc 1 102 14 view .LVU109
+ 418 000c 6422     		movs	r2, #100
+ 419              	.LVL18:
+ 102:Src/main.c    ****     if (status) {
+ 420              		.loc 1 102 14 view .LVU110
+ 421 000e 0092     		str	r2, [sp]
+ 422 0010 2246     		mov	r2, r4
+ 423 0012 0848     		ldr	r0, .L27
+ 424              	.LVL19:
+ 102:Src/main.c    ****     if (status) {
+ 425              		.loc 1 102 14 view .LVU111
+ 426 0014 FFF7FEFF 		bl	HAL_I2C_Master_Receive
+ 427              	.LVL20:
+ 428 0018 0446     		mov	r4, r0
+ 429              	.LVL21:
+ 102:Src/main.c    ****     if (status) {
+ 430              		.loc 1 102 12 view .LVU112
+ 431 001a 0546     		mov	r5, r0
+ 432              	.LVL22:
+ 103:Src/main.c    ****         HAL_I2C_MspInit(&hi2c1);
+ 433              		.loc 1 103 5 is_stmt 1 view .LVU113
+ 103:Src/main.c    ****         HAL_I2C_MspInit(&hi2c1);
+ 434              		.loc 1 103 8 is_stmt 0 view .LVU114
+ 435 001c 18B9     		cbnz	r0, .L25
+ 436              	.LVL23:
+ 437              	.L22:
+ 107:Src/main.c    **** }
+ 438              		.loc 1 107 5 is_stmt 1 view .LVU115
+ 107:Src/main.c    **** }
+ 439              		.loc 1 107 23 is_stmt 0 view .LVU116
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 17
+
+
+ 440 001e 34B9     		cbnz	r4, .L26
+ 441              	.L21:
+ 108:Src/main.c    **** 
+ 442              		.loc 1 108 1 view .LVU117
+ 443 0020 2846     		mov	r0, r5
+ 444 0022 03B0     		add	sp, sp, #12
+ 445              	.LCFI11:
+ 446              		.cfi_remember_state
+ 447              		.cfi_def_cfa_offset 12
+ 448              		@ sp needed
+ 449 0024 30BD     		pop	{r4, r5, pc}
+ 450              	.LVL24:
+ 451              	.L25:
+ 452              	.LCFI12:
+ 453              		.cfi_restore_state
+ 104:Src/main.c    ****     }
+ 454              		.loc 1 104 9 is_stmt 1 view .LVU118
+ 455 0026 0348     		ldr	r0, .L27
+ 456              	.LVL25:
+ 104:Src/main.c    ****     }
+ 457              		.loc 1 104 9 is_stmt 0 view .LVU119
+ 458 0028 FFF7FEFF 		bl	HAL_I2C_MspInit
+ 459              	.LVL26:
+ 460 002c F7E7     		b	.L22
+ 461              	.L26:
+ 107:Src/main.c    **** }
+ 462              		.loc 1 107 23 view .LVU120
+ 463 002e 4FF0FF35 		mov	r5, #-1
+ 464 0032 F5E7     		b	.L21
+ 465              	.L28:
+ 466              		.align	2
+ 467              	.L27:
+ 468 0034 00000000 		.word	hi2c1
+ 469              		.cfi_endproc
+ 470              	.LFE131:
+ 472              		.section	.text.WaitMilliSec,"ax",%progbits
+ 473              		.align	1
+ 474              		.global	WaitMilliSec
+ 475              		.syntax unified
+ 476              		.thumb
+ 477              		.thumb_func
+ 478              		.fpu fpv4-sp-d16
+ 480              	WaitMilliSec:
+ 481              	.LVL27:
+ 482              	.LFB132:
+ 110:Src/main.c    ****     HAL_Delay(ms); /* it's milli sec  cos we do set systick to 1KHz */
+ 483              		.loc 1 110 27 is_stmt 1 view -0
+ 484              		.cfi_startproc
+ 485              		@ args = 0, pretend = 0, frame = 0
+ 486              		@ frame_needed = 0, uses_anonymous_args = 0
+ 110:Src/main.c    ****     HAL_Delay(ms); /* it's milli sec  cos we do set systick to 1KHz */
+ 487              		.loc 1 110 27 is_stmt 0 view .LVU122
+ 488 0000 08B5     		push	{r3, lr}
+ 489              	.LCFI13:
+ 490              		.cfi_def_cfa_offset 8
+ 491              		.cfi_offset 3, -8
+ 492              		.cfi_offset 14, -4
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 18
+
+
+ 111:Src/main.c    **** }
+ 493              		.loc 1 111 5 is_stmt 1 view .LVU123
+ 494 0002 FFF7FEFF 		bl	HAL_Delay
+ 495              	.LVL28:
+ 112:Src/main.c    **** 
+ 496              		.loc 1 112 1 is_stmt 0 view .LVU124
+ 497 0006 08BD     		pop	{r3, pc}
+ 498              		.cfi_endproc
+ 499              	.LFE132:
+ 501              		.section	.text.SystemClock_Config,"ax",%progbits
+ 502              		.align	1
+ 503              		.global	SystemClock_Config
+ 504              		.syntax unified
+ 505              		.thumb
+ 506              		.thumb_func
+ 507              		.fpu fpv4-sp-d16
+ 509              	SystemClock_Config:
+ 510              	.LFB134:
+ 273:Src/main.c    ****   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+ 511              		.loc 1 273 1 is_stmt 1 view -0
+ 512              		.cfi_startproc
+ 513              		@ args = 0, pretend = 0, frame = 80
+ 514              		@ frame_needed = 0, uses_anonymous_args = 0
+ 515 0000 30B5     		push	{r4, r5, lr}
+ 516              	.LCFI14:
+ 517              		.cfi_def_cfa_offset 12
+ 518              		.cfi_offset 4, -12
+ 519              		.cfi_offset 5, -8
+ 520              		.cfi_offset 14, -4
+ 521 0002 95B0     		sub	sp, sp, #84
+ 522              	.LCFI15:
+ 523              		.cfi_def_cfa_offset 96
+ 274:Src/main.c    ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 524              		.loc 1 274 3 view .LVU126
+ 274:Src/main.c    ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 525              		.loc 1 274 22 is_stmt 0 view .LVU127
+ 526 0004 3422     		movs	r2, #52
+ 527 0006 0021     		movs	r1, #0
+ 528 0008 07A8     		add	r0, sp, #28
+ 529 000a FFF7FEFF 		bl	memset
+ 530              	.LVL29:
+ 275:Src/main.c    **** 
+ 531              		.loc 1 275 3 is_stmt 1 view .LVU128
+ 275:Src/main.c    **** 
+ 532              		.loc 1 275 22 is_stmt 0 view .LVU129
+ 533 000e 0024     		movs	r4, #0
+ 534 0010 0294     		str	r4, [sp, #8]
+ 535 0012 0394     		str	r4, [sp, #12]
+ 536 0014 0494     		str	r4, [sp, #16]
+ 537 0016 0594     		str	r4, [sp, #20]
+ 538 0018 0694     		str	r4, [sp, #24]
+ 279:Src/main.c    ****   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+ 539              		.loc 1 279 3 is_stmt 1 view .LVU130
+ 540              	.LBB6:
+ 279:Src/main.c    ****   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+ 541              		.loc 1 279 3 view .LVU131
+ 542 001a 0094     		str	r4, [sp]
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 19
+
+
+ 279:Src/main.c    ****   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+ 543              		.loc 1 279 3 view .LVU132
+ 544 001c 1B4B     		ldr	r3, .L33
+ 545 001e 1A6C     		ldr	r2, [r3, #64]
+ 546 0020 42F08052 		orr	r2, r2, #268435456
+ 547 0024 1A64     		str	r2, [r3, #64]
+ 279:Src/main.c    ****   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+ 548              		.loc 1 279 3 view .LVU133
+ 549 0026 1B6C     		ldr	r3, [r3, #64]
+ 550 0028 03F08053 		and	r3, r3, #268435456
+ 551 002c 0093     		str	r3, [sp]
+ 279:Src/main.c    ****   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+ 552              		.loc 1 279 3 view .LVU134
+ 553 002e 009B     		ldr	r3, [sp]
+ 554              	.LBE6:
+ 279:Src/main.c    ****   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+ 555              		.loc 1 279 3 view .LVU135
+ 280:Src/main.c    ****   /** Initializes the CPU, AHB and APB busses clocks 
+ 556              		.loc 1 280 3 view .LVU136
+ 557              	.LBB7:
+ 280:Src/main.c    ****   /** Initializes the CPU, AHB and APB busses clocks 
+ 558              		.loc 1 280 3 view .LVU137
+ 559 0030 0194     		str	r4, [sp, #4]
+ 280:Src/main.c    ****   /** Initializes the CPU, AHB and APB busses clocks 
+ 560              		.loc 1 280 3 view .LVU138
+ 561 0032 174A     		ldr	r2, .L33+4
+ 562 0034 1368     		ldr	r3, [r2]
+ 563 0036 23F44043 		bic	r3, r3, #49152
+ 564 003a 43F48043 		orr	r3, r3, #16384
+ 565 003e 1360     		str	r3, [r2]
+ 280:Src/main.c    ****   /** Initializes the CPU, AHB and APB busses clocks 
+ 566              		.loc 1 280 3 view .LVU139
+ 567 0040 1368     		ldr	r3, [r2]
+ 568 0042 03F44043 		and	r3, r3, #49152
+ 569 0046 0193     		str	r3, [sp, #4]
+ 280:Src/main.c    ****   /** Initializes the CPU, AHB and APB busses clocks 
+ 570              		.loc 1 280 3 view .LVU140
+ 571 0048 019B     		ldr	r3, [sp, #4]
+ 572              	.LBE7:
+ 280:Src/main.c    ****   /** Initializes the CPU, AHB and APB busses clocks 
+ 573              		.loc 1 280 3 view .LVU141
+ 283:Src/main.c    ****   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+ 574              		.loc 1 283 3 view .LVU142
+ 283:Src/main.c    ****   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+ 575              		.loc 1 283 36 is_stmt 0 view .LVU143
+ 576 004a 0225     		movs	r5, #2
+ 577 004c 0795     		str	r5, [sp, #28]
+ 284:Src/main.c    ****   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+ 578              		.loc 1 284 3 is_stmt 1 view .LVU144
+ 284:Src/main.c    ****   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+ 579              		.loc 1 284 30 is_stmt 0 view .LVU145
+ 580 004e 0123     		movs	r3, #1
+ 581 0050 0A93     		str	r3, [sp, #40]
+ 285:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+ 582              		.loc 1 285 3 is_stmt 1 view .LVU146
+ 285:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+ 583              		.loc 1 285 41 is_stmt 0 view .LVU147
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 20
+
+
+ 584 0052 1023     		movs	r3, #16
+ 585 0054 0B93     		str	r3, [sp, #44]
+ 286:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+ 586              		.loc 1 286 3 is_stmt 1 view .LVU148
+ 286:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+ 587              		.loc 1 286 34 is_stmt 0 view .LVU149
+ 588 0056 0D95     		str	r5, [sp, #52]
+ 287:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLM = 16;
+ 589              		.loc 1 287 3 is_stmt 1 view .LVU150
+ 287:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLM = 16;
+ 590              		.loc 1 287 35 is_stmt 0 view .LVU151
+ 591 0058 0E94     		str	r4, [sp, #56]
+ 288:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLN = 336;
+ 592              		.loc 1 288 3 is_stmt 1 view .LVU152
+ 288:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLN = 336;
+ 593              		.loc 1 288 30 is_stmt 0 view .LVU153
+ 594 005a 0F93     		str	r3, [sp, #60]
+ 289:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+ 595              		.loc 1 289 3 is_stmt 1 view .LVU154
+ 289:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+ 596              		.loc 1 289 30 is_stmt 0 view .LVU155
+ 597 005c 4FF4A873 		mov	r3, #336
+ 598 0060 1093     		str	r3, [sp, #64]
+ 290:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLQ = 2;
+ 599              		.loc 1 290 3 is_stmt 1 view .LVU156
+ 290:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLQ = 2;
+ 600              		.loc 1 290 30 is_stmt 0 view .LVU157
+ 601 0062 0423     		movs	r3, #4
+ 602 0064 1193     		str	r3, [sp, #68]
+ 291:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLR = 2;
+ 603              		.loc 1 291 3 is_stmt 1 view .LVU158
+ 291:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLR = 2;
+ 604              		.loc 1 291 30 is_stmt 0 view .LVU159
+ 605 0066 1295     		str	r5, [sp, #72]
+ 292:Src/main.c    ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+ 606              		.loc 1 292 3 is_stmt 1 view .LVU160
+ 292:Src/main.c    ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+ 607              		.loc 1 292 30 is_stmt 0 view .LVU161
+ 608 0068 1395     		str	r5, [sp, #76]
+ 293:Src/main.c    ****   {
+ 609              		.loc 1 293 3 is_stmt 1 view .LVU162
+ 293:Src/main.c    ****   {
+ 610              		.loc 1 293 7 is_stmt 0 view .LVU163
+ 611 006a 07A8     		add	r0, sp, #28
+ 612 006c FFF7FEFF 		bl	HAL_RCC_OscConfig
+ 613              	.LVL30:
+ 299:Src/main.c    ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 614              		.loc 1 299 3 is_stmt 1 view .LVU164
+ 299:Src/main.c    ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 615              		.loc 1 299 31 is_stmt 0 view .LVU165
+ 616 0070 0F23     		movs	r3, #15
+ 617 0072 0293     		str	r3, [sp, #8]
+ 301:Src/main.c    ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 618              		.loc 1 301 3 is_stmt 1 view .LVU166
+ 301:Src/main.c    ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 619              		.loc 1 301 34 is_stmt 0 view .LVU167
+ 620 0074 0395     		str	r5, [sp, #12]
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 21
+
+
+ 302:Src/main.c    ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+ 621              		.loc 1 302 3 is_stmt 1 view .LVU168
+ 302:Src/main.c    ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+ 622              		.loc 1 302 35 is_stmt 0 view .LVU169
+ 623 0076 0494     		str	r4, [sp, #16]
+ 303:Src/main.c    ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 624              		.loc 1 303 3 is_stmt 1 view .LVU170
+ 303:Src/main.c    ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 625              		.loc 1 303 36 is_stmt 0 view .LVU171
+ 626 0078 4FF48053 		mov	r3, #4096
+ 627 007c 0593     		str	r3, [sp, #20]
+ 304:Src/main.c    **** 
+ 628              		.loc 1 304 3 is_stmt 1 view .LVU172
+ 304:Src/main.c    **** 
+ 629              		.loc 1 304 36 is_stmt 0 view .LVU173
+ 630 007e 0694     		str	r4, [sp, #24]
+ 306:Src/main.c    ****   {
+ 631              		.loc 1 306 3 is_stmt 1 view .LVU174
+ 306:Src/main.c    ****   {
+ 632              		.loc 1 306 7 is_stmt 0 view .LVU175
+ 633 0080 2946     		mov	r1, r5
+ 634 0082 02A8     		add	r0, sp, #8
+ 635 0084 FFF7FEFF 		bl	HAL_RCC_ClockConfig
+ 636              	.LVL31:
+ 310:Src/main.c    **** 
+ 637              		.loc 1 310 1 view .LVU176
+ 638 0088 15B0     		add	sp, sp, #84
+ 639              	.LCFI16:
+ 640              		.cfi_def_cfa_offset 12
+ 641              		@ sp needed
+ 642 008a 30BD     		pop	{r4, r5, pc}
+ 643              	.L34:
+ 644              		.align	2
+ 645              	.L33:
+ 646 008c 00380240 		.word	1073887232
+ 647 0090 00700040 		.word	1073770496
+ 648              		.cfi_endproc
+ 649              	.LFE134:
+ 651              		.section	.text.main,"ax",%progbits
+ 652              		.align	1
+ 653              		.global	main
+ 654              		.syntax unified
+ 655              		.thumb
+ 656              		.thumb_func
+ 657              		.fpu fpv4-sp-d16
+ 659              	main:
+ 660              	.LFB133:
+ 123:Src/main.c    ****   /* USER CODE BEGIN 1 */
+ 661              		.loc 1 123 1 is_stmt 1 view -0
+ 662              		.cfi_startproc
+ 663              		@ args = 0, pretend = 0, frame = 16
+ 664              		@ frame_needed = 0, uses_anonymous_args = 0
+ 665 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 666              	.LCFI17:
+ 667              		.cfi_def_cfa_offset 24
+ 668              		.cfi_offset 4, -24
+ 669              		.cfi_offset 5, -20
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 22
+
+
+ 670              		.cfi_offset 6, -16
+ 671              		.cfi_offset 7, -12
+ 672              		.cfi_offset 8, -8
+ 673              		.cfi_offset 14, -4
+ 674 0004 84B0     		sub	sp, sp, #16
+ 675              	.LCFI18:
+ 676              		.cfi_def_cfa_offset 40
+ 127:Src/main.c    ****   int i;
+ 677              		.loc 1 127 3 view .LVU178
+ 128:Src/main.c    ****   int n_dev=2;
+ 678              		.loc 1 128 3 view .LVU179
+ 129:Src/main.c    ****   int PresentDevMask;
+ 679              		.loc 1 129 3 view .LVU180
+ 680              	.LVL32:
+ 130:Src/main.c    ****   int nPresentDevs;
+ 681              		.loc 1 130 3 view .LVU181
+ 131:Src/main.c    ****   int PresentDevIds[MAX_DEV];
+ 682              		.loc 1 131 3 view .LVU182
+ 132:Src/main.c    ****   int nReady;
+ 683              		.loc 1 132 3 view .LVU183
+ 133:Src/main.c    ****   /* USER CODE END 1 */
+ 684              		.loc 1 133 3 view .LVU184
+ 139:Src/main.c    **** 
+ 685              		.loc 1 139 3 view .LVU185
+ 686 0006 FFF7FEFF 		bl	HAL_Init
+ 687              	.LVL33:
+ 146:Src/main.c    **** 
+ 688              		.loc 1 146 3 view .LVU186
+ 689 000a FFF7FEFF 		bl	SystemClock_Config
+ 690              	.LVL34:
+ 153:Src/main.c    ****   MX_I2C1_Init();
+ 691              		.loc 1 153 3 view .LVU187
+ 692 000e FFF7FEFF 		bl	MX_GPIO_Init
+ 693              	.LVL35:
+ 154:Src/main.c    ****   MX_USART2_UART_Init();
+ 694              		.loc 1 154 3 view .LVU188
+ 695 0012 FFF7FEFF 		bl	MX_I2C1_Init
+ 696              	.LVL36:
+ 155:Src/main.c    ****   /* USER CODE BEGIN 2 */
+ 697              		.loc 1 155 3 view .LVU189
+ 698 0016 FFF7FEFF 		bl	MX_USART2_UART_Init
+ 699              	.LVL37:
+ 161:Src/main.c    ****   nPresentDevs = 0;
+ 700              		.loc 1 161 3 view .LVU190
+ 162:Src/main.c    ****   //strcpy(DisplayStr,"TLBR");
+ 701              		.loc 1 162 3 view .LVU191
+ 164:Src/main.c    ****       int FinalI2cAddr;
+ 702              		.loc 1 164 3 view .LVU192
+ 162:Src/main.c    ****   //strcpy(DisplayStr,"TLBR");
+ 703              		.loc 1 162 16 is_stmt 0 view .LVU193
+ 704 001a 0026     		movs	r6, #0
+ 164:Src/main.c    ****       int FinalI2cAddr;
+ 705              		.loc 1 164 10 view .LVU194
+ 706 001c 3446     		mov	r4, r6
+ 164:Src/main.c    ****       int FinalI2cAddr;
+ 707              		.loc 1 164 3 view .LVU195
+ 708 001e 1FE0     		b	.L36
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 23
+
+
+ 709              	.LVL38:
+ 710              	.L54:
+ 711              	.LBB8:
+ 168:Src/main.c    ****       if (i==1)
+ 712              		.loc 1 168 9 is_stmt 1 view .LVU196
+ 713 0020 4FF40061 		mov	r1, #2048
+ 714 0024 6648     		ldr	r0, .L60
+ 715 0026 FFF7FEFF 		bl	HAL_GPIO_TogglePin
+ 716              	.LVL39:
+ 717 002a 1DE0     		b	.L37
+ 718              	.L55:
+ 170:Src/main.c    ****         
+ 719              		.loc 1 170 9 view .LVU197
+ 720 002c 4FF48051 		mov	r1, #4096
+ 721 0030 6348     		ldr	r0, .L60
+ 722 0032 FFF7FEFF 		bl	HAL_GPIO_TogglePin
+ 723              	.LVL40:
+ 724 0036 19E0     		b	.L38
+ 725              	.LVL41:
+ 726              	.L41:
+ 200:Src/main.c    ****       status = VL6180x_RdByte(&BoardDevs[i], IDENTIFICATION_MODEL_ID, &id);
+ 727              		.loc 1 200 7 view .LVU198
+ 728 0038 0120     		movs	r0, #1
+ 729 003a FFF7FEFF 		bl	WaitMilliSec
+ 730              	.LVL42:
+ 201:Src/main.c    ****       WaitMilliSec(1);
+ 731              		.loc 1 201 7 view .LVU199
+ 201:Src/main.c    ****       WaitMilliSec(1);
+ 732              		.loc 1 201 16 is_stmt 0 view .LVU200
+ 733 003e 0DF10702 		add	r2, sp, #7
+ 734 0042 0021     		movs	r1, #0
+ 735 0044 2846     		mov	r0, r5
+ 736 0046 FFF7FEFF 		bl	VL6180x_RdByte
+ 737              	.LVL43:
+ 202:Src/main.c    ****       status= VL6180x_Prepare(&BoardDevs[i]);
+ 738              		.loc 1 202 7 is_stmt 1 view .LVU201
+ 739 004a 0120     		movs	r0, #1
+ 740 004c FFF7FEFF 		bl	WaitMilliSec
+ 741              	.LVL44:
+ 203:Src/main.c    ****       if( status<0 ){
+ 742              		.loc 1 203 7 view .LVU202
+ 203:Src/main.c    ****       if( status<0 ){
+ 743              		.loc 1 203 15 is_stmt 0 view .LVU203
+ 744 0050 2846     		mov	r0, r5
+ 745 0052 FFF7FEFF 		bl	VL6180x_Prepare
+ 746              	.LVL45:
+ 204:Src/main.c    ****           //HandleError("VL6180x_Prepare fail");
+ 747              		.loc 1 204 7 is_stmt 1 view .LVU204
+ 206:Src/main.c    ****       /* Disable Dmax computation */
+ 748              		.loc 1 206 7 view .LVU205
+ 208:Src/main.c    **** 
+ 749              		.loc 1 208 7 view .LVU206
+ 750 0056 0021     		movs	r1, #0
+ 751 0058 2846     		mov	r0, r5
+ 752 005a FFF7FEFF 		bl	VL6180x_DMaxSetState
+ 753              	.LVL46:
+ 754              	.L40:
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 24
+
+
+ 208:Src/main.c    **** 
+ 755              		.loc 1 208 7 is_stmt 0 view .LVU207
+ 756              	.LBE8:
+ 164:Src/main.c    ****       int FinalI2cAddr;
+ 757              		.loc 1 164 31 is_stmt 1 discriminator 2 view .LVU208
+ 164:Src/main.c    ****       int FinalI2cAddr;
+ 758              		.loc 1 164 32 is_stmt 0 discriminator 2 view .LVU209
+ 759 005e 0134     		adds	r4, r4, #1
+ 760              	.LVL47:
+ 761              	.L36:
+ 164:Src/main.c    ****       int FinalI2cAddr;
+ 762              		.loc 1 164 15 is_stmt 1 discriminator 1 view .LVU210
+ 164:Src/main.c    ****       int FinalI2cAddr;
+ 763              		.loc 1 164 3 is_stmt 0 discriminator 1 view .LVU211
+ 764 0060 012C     		cmp	r4, #1
+ 765 0062 31DC     		bgt	.L53
+ 766              	.LBB9:
+ 165:Src/main.c    ****       uint8_t id;
+ 767              		.loc 1 165 7 is_stmt 1 view .LVU212
+ 166:Src/main.c    ****       if (i==0)
+ 768              		.loc 1 166 7 view .LVU213
+ 167:Src/main.c    ****         HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_11);
+ 769              		.loc 1 167 7 view .LVU214
+ 167:Src/main.c    ****         HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_11);
+ 770              		.loc 1 167 10 is_stmt 0 view .LVU215
+ 771 0064 002C     		cmp	r4, #0
+ 772 0066 DBD0     		beq	.L54
+ 773              	.L37:
+ 169:Src/main.c    ****         HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_12);
+ 774              		.loc 1 169 7 is_stmt 1 view .LVU216
+ 169:Src/main.c    ****         HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_12);
+ 775              		.loc 1 169 10 is_stmt 0 view .LVU217
+ 776 0068 012C     		cmp	r4, #1
+ 777 006a DFD0     		beq	.L55
+ 778              	.L38:
+ 173:Src/main.c    ****       BoardDevs[i].I2cAddr = 0x52;
+ 779              		.loc 1 173 7 is_stmt 1 view .LVU218
+ 780 006c 0220     		movs	r0, #2
+ 781 006e FFF7FEFF 		bl	WaitMilliSec
+ 782              	.LVL48:
+ 174:Src/main.c    ****       /* to detect device presence try to read it's dev id */
+ 783              		.loc 1 174 7 view .LVU219
+ 174:Src/main.c    ****       /* to detect device presence try to read it's dev id */
+ 784              		.loc 1 174 28 is_stmt 0 view .LVU220
+ 785 0072 544B     		ldr	r3, .L60+4
+ 786 0074 D425     		movs	r5, #212
+ 787 0076 05FB0435 		mla	r5, r5, r4, r3
+ 788 007a 5223     		movs	r3, #82
+ 789 007c 85F8D030 		strb	r3, [r5, #208]
+ 176:Src/main.c    ****       if (status) {
+ 790              		.loc 1 176 7 is_stmt 1 view .LVU221
+ 176:Src/main.c    ****       if (status) {
+ 791              		.loc 1 176 16 is_stmt 0 view .LVU222
+ 792 0080 0DF10702 		add	r2, sp, #7
+ 793 0084 0021     		movs	r1, #0
+ 794 0086 2846     		mov	r0, r5
+ 795 0088 FFF7FEFF 		bl	VL6180x_RdByte
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 25
+
+
+ 796              	.LVL49:
+ 177:Src/main.c    ****           /* these device is not present skip init and clear it's letter on string */
+ 797              		.loc 1 177 7 is_stmt 1 view .LVU223
+ 177:Src/main.c    ****           /* these device is not present skip init and clear it's letter on string */
+ 798              		.loc 1 177 10 is_stmt 0 view .LVU224
+ 799 008c 0028     		cmp	r0, #0
+ 800 008e E6D1     		bne	.L40
+ 185:Src/main.c    ****       PresentDevMask |= 1 << i;
+ 801              		.loc 1 185 7 is_stmt 1 view .LVU225
+ 185:Src/main.c    ****       PresentDevMask |= 1 << i;
+ 802              		.loc 1 185 28 is_stmt 0 view .LVU226
+ 803 0090 95F8D220 		ldrb	r2, [r5, #210]	@ zero_extendqisi2
+ 804 0094 42F00102 		orr	r2, r2, #1
+ 805 0098 85F8D220 		strb	r2, [r5, #210]
+ 186:Src/main.c    ****       PresentDevIds[nPresentDevs]=i;
+ 806              		.loc 1 186 7 is_stmt 1 view .LVU227
+ 187:Src/main.c    ****       nPresentDevs++;
+ 807              		.loc 1 187 7 view .LVU228
+ 187:Src/main.c    ****       nPresentDevs++;
+ 808              		.loc 1 187 34 is_stmt 0 view .LVU229
+ 809 009c 04AB     		add	r3, sp, #16
+ 810 009e 03EB8603 		add	r3, r3, r6, lsl #2
+ 811 00a2 43F8084C 		str	r4, [r3, #-8]
+ 188:Src/main.c    ****       status = VL6180x_InitData(&BoardDevs[i]);
+ 812              		.loc 1 188 7 is_stmt 1 view .LVU230
+ 188:Src/main.c    ****       status = VL6180x_InitData(&BoardDevs[i]);
+ 813              		.loc 1 188 19 is_stmt 0 view .LVU231
+ 814 00a6 0136     		adds	r6, r6, #1
+ 815              	.LVL50:
+ 189:Src/main.c    **** 
+ 816              		.loc 1 189 7 is_stmt 1 view .LVU232
+ 189:Src/main.c    **** 
+ 817              		.loc 1 189 16 is_stmt 0 view .LVU233
+ 818 00a8 2846     		mov	r0, r5
+ 819              	.LVL51:
+ 189:Src/main.c    **** 
+ 820              		.loc 1 189 16 view .LVU234
+ 821 00aa FFF7FEFF 		bl	VL6180x_InitData
+ 822              	.LVL52:
+ 191:Src/main.c    ****       if (FinalI2cAddr != 0x52) {
+ 823              		.loc 1 191 7 is_stmt 1 view .LVU235
+ 191:Src/main.c    ****       if (FinalI2cAddr != 0x52) {
+ 824              		.loc 1 191 27 is_stmt 0 view .LVU236
+ 825 00ae 04F12A07 		add	r7, r4, #42
+ 191:Src/main.c    ****       if (FinalI2cAddr != 0x52) {
+ 826              		.loc 1 191 20 view .LVU237
+ 827 00b2 7F00     		lsls	r7, r7, #1
+ 828              	.LVL53:
+ 192:Src/main.c    ****           status = VL6180x_SetI2CAddress(&BoardDevs[i], FinalI2cAddr);
+ 829              		.loc 1 192 7 is_stmt 1 view .LVU238
+ 192:Src/main.c    ****           status = VL6180x_SetI2CAddress(&BoardDevs[i], FinalI2cAddr);
+ 830              		.loc 1 192 10 is_stmt 0 view .LVU239
+ 831 00b4 522F     		cmp	r7, #82
+ 832 00b6 BFD0     		beq	.L41
+ 193:Src/main.c    ****           if( status ){
+ 833              		.loc 1 193 11 is_stmt 1 view .LVU240
+ 193:Src/main.c    ****           if( status ){
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 26
+
+
+ 834              		.loc 1 193 20 is_stmt 0 view .LVU241
+ 835 00b8 FFB2     		uxtb	r7, r7
+ 836              	.LVL54:
+ 193:Src/main.c    ****           if( status ){
+ 837              		.loc 1 193 20 view .LVU242
+ 838 00ba 3946     		mov	r1, r7
+ 839 00bc 2846     		mov	r0, r5
+ 840 00be FFF7FEFF 		bl	VL6180x_SetI2CAddress
+ 841              	.LVL55:
+ 194:Src/main.c    ****               //HandleError("VL6180x_SetI2CAddress fail");
+ 842              		.loc 1 194 11 is_stmt 1 view .LVU243
+ 196:Src/main.c    ****           BoardDevs[i].I2cAddr = FinalI2cAddr;
+ 843              		.loc 1 196 11 view .LVU244
+ 197:Src/main.c    ****       }
+ 844              		.loc 1 197 11 view .LVU245
+ 197:Src/main.c    ****       }
+ 845              		.loc 1 197 32 is_stmt 0 view .LVU246
+ 846 00c2 85F8D070 		strb	r7, [r5, #208]
+ 847 00c6 B7E7     		b	.L41
+ 848              	.LVL56:
+ 849              	.L53:
+ 197:Src/main.c    ****       }
+ 850              		.loc 1 197 32 view .LVU247
+ 851              	.LBE9:
+ 211:Src/main.c    **** 
+ 852              		.loc 1 211 5 is_stmt 1 view .LVU248
+ 853 00c8 1E20     		movs	r0, #30
+ 854 00ca FFF7FEFF 		bl	HAL_Delay
+ 855              	.LVL57:
+ 856 00ce 74E0     		b	.L51
+ 857              	.LVL58:
+ 858              	.L44:
+ 859              	.LBB10:
+ 223:Src/main.c    ****         status = VL6180x_RangeStartSingleShot(dev);
+ 860              		.loc 1 223 9 view .LVU249
+ 223:Src/main.c    ****         status = VL6180x_RangeStartSingleShot(dev);
+ 861              		.loc 1 223 41 is_stmt 0 view .LVU250
+ 862 00d0 04AB     		add	r3, sp, #16
+ 863 00d2 03EB8503 		add	r3, r3, r5, lsl #2
+ 864 00d6 53F8084C 		ldr	r4, [r3, #-8]
+ 223:Src/main.c    ****         status = VL6180x_RangeStartSingleShot(dev);
+ 865              		.loc 1 223 13 view .LVU251
+ 866 00da D422     		movs	r2, #212
+ 867 00dc 394B     		ldr	r3, .L60+4
+ 868 00de 02FB0434 		mla	r4, r2, r4, r3
+ 869              	.LVL59:
+ 224:Src/main.c    ****         if( status<0 ){
+ 870              		.loc 1 224 9 is_stmt 1 view .LVU252
+ 224:Src/main.c    ****         if( status<0 ){
+ 871              		.loc 1 224 18 is_stmt 0 view .LVU253
+ 872 00e2 2046     		mov	r0, r4
+ 873 00e4 FFF7FEFF 		bl	VL6180x_RangeStartSingleShot
+ 874              	.LVL60:
+ 225:Src/main.c    ****             //TODO: print error : debug
+ 875              		.loc 1 225 9 is_stmt 1 view .LVU254
+ 227:Src/main.c    ****         dev->Ready=0;
+ 876              		.loc 1 227 9 view .LVU255
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 27
+
+
+ 228:Src/main.c    ****     }
+ 877              		.loc 1 228 9 view .LVU256
+ 228:Src/main.c    ****     }
+ 878              		.loc 1 228 19 is_stmt 0 view .LVU257
+ 879 00e8 94F8D230 		ldrb	r3, [r4, #210]	@ zero_extendqisi2
+ 880 00ec 6FF34103 		bfc	r3, #1, #1
+ 881 00f0 84F8D230 		strb	r3, [r4, #210]
+ 222:Src/main.c    ****         dev =  BoardDevs + PresentDevIds[i];
+ 882              		.loc 1 222 31 is_stmt 1 view .LVU258
+ 222:Src/main.c    ****         dev =  BoardDevs + PresentDevIds[i];
+ 883              		.loc 1 222 32 is_stmt 0 view .LVU259
+ 884 00f4 0135     		adds	r5, r5, #1
+ 885              	.LVL61:
+ 886              	.L43:
+ 222:Src/main.c    ****         dev =  BoardDevs + PresentDevIds[i];
+ 887              		.loc 1 222 15 is_stmt 1 discriminator 1 view .LVU260
+ 222:Src/main.c    ****         dev =  BoardDevs + PresentDevIds[i];
+ 888              		.loc 1 222 5 is_stmt 0 discriminator 1 view .LVU261
+ 889 00f6 B542     		cmp	r5, r6
+ 890 00f8 EADB     		blt	.L44
+ 232:Src/main.c    ****     
+ 891              		.loc 1 232 11 view .LVU262
+ 892 00fa 4FF00008 		mov	r8, #0
+ 893 00fe 57E0     		b	.L50
+ 894              	.LVL62:
+ 895              	.L57:
+ 241:Src/main.c    ****                 if (i==1)
+ 896              		.loc 1 241 19 is_stmt 1 view .LVU263
+ 241:Src/main.c    ****                 if (i==1)
+ 897              		.loc 1 241 28 is_stmt 0 view .LVU264
+ 898 0100 04EB8407 		add	r7, r4, r4, lsl #2
+ 899 0104 DFF8C4C0 		ldr	ip, .L60+12
+ 900 0108 2F4B     		ldr	r3, .L60+8
+ 901 010a 03EBC707 		add	r7, r3, r7, lsl #3
+ 902 010e 0FCF     		ldmia	r7!, {r0, r1, r2, r3}
+ 903              	.LVL63:
+ 241:Src/main.c    ****                 if (i==1)
+ 904              		.loc 1 241 28 view .LVU265
+ 905 0110 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 906 0114 0FCF     		ldmia	r7!, {r0, r1, r2, r3}
+ 907 0116 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 908 011a 97E80300 		ldm	r7, {r0, r1}
+ 909 011e 8CE80300 		stm	ip, {r0, r1}
+ 910 0122 2DE0     		b	.L47
+ 911              	.L58:
+ 243:Src/main.c    ****                 if( status == 0 ){
+ 912              		.loc 1 243 19 is_stmt 1 view .LVU266
+ 243:Src/main.c    ****                 if( status == 0 ){
+ 913              		.loc 1 243 28 is_stmt 0 view .LVU267
+ 914 0124 04EB8407 		add	r7, r4, r4, lsl #2
+ 915 0128 DFF8A4C0 		ldr	ip, .L60+16
+ 916 012c 264B     		ldr	r3, .L60+8
+ 917 012e 03EBC707 		add	r7, r3, r7, lsl #3
+ 918 0132 0FCF     		ldmia	r7!, {r0, r1, r2, r3}
+ 919 0134 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 920 0138 0FCF     		ldmia	r7!, {r0, r1, r2, r3}
+ 921 013a ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 28
+
+
+ 922 013e 97E80300 		ldm	r7, {r0, r1}
+ 923 0142 8CE80300 		stm	ip, {r0, r1}
+ 924 0146 1DE0     		b	.L48
+ 925              	.LVL64:
+ 926              	.L46:
+ 252:Src/main.c    ****             }
+ 927              		.loc 1 252 17 is_stmt 1 discriminator 2 view .LVU268
+ 236:Src/main.c    ****             dev =  BoardDevs + PresentDevIds[i];
+ 928              		.loc 1 236 35 discriminator 2 view .LVU269
+ 236:Src/main.c    ****             dev =  BoardDevs + PresentDevIds[i];
+ 929              		.loc 1 236 36 is_stmt 0 discriminator 2 view .LVU270
+ 930 0148 0134     		adds	r4, r4, #1
+ 931              	.LVL65:
+ 932              	.L45:
+ 236:Src/main.c    ****             dev =  BoardDevs + PresentDevIds[i];
+ 933              		.loc 1 236 19 is_stmt 1 discriminator 1 view .LVU271
+ 236:Src/main.c    ****             dev =  BoardDevs + PresentDevIds[i];
+ 934              		.loc 1 236 9 is_stmt 0 discriminator 1 view .LVU272
+ 935 014a B442     		cmp	r4, r6
+ 936 014c 2EDA     		bge	.L56
+ 237:Src/main.c    ****             if( !dev->Ready ){
+ 937              		.loc 1 237 13 is_stmt 1 view .LVU273
+ 237:Src/main.c    ****             if( !dev->Ready ){
+ 938              		.loc 1 237 45 is_stmt 0 view .LVU274
+ 939 014e 04AB     		add	r3, sp, #16
+ 940 0150 03EB8403 		add	r3, r3, r4, lsl #2
+ 941 0154 53F8085C 		ldr	r5, [r3, #-8]
+ 237:Src/main.c    ****             if( !dev->Ready ){
+ 942              		.loc 1 237 17 view .LVU275
+ 943 0158 D422     		movs	r2, #212
+ 944 015a 1A4B     		ldr	r3, .L60+4
+ 945 015c 02FB0535 		mla	r5, r2, r5, r3
+ 946              	.LVL66:
+ 238:Src/main.c    ****                 status = VL6180x_RangeGetMeasurementIfReady(dev, &Range[i]);
+ 947              		.loc 1 238 13 is_stmt 1 view .LVU276
+ 238:Src/main.c    ****                 status = VL6180x_RangeGetMeasurementIfReady(dev, &Range[i]);
+ 948              		.loc 1 238 17 is_stmt 0 view .LVU277
+ 949 0160 95F8D230 		ldrb	r3, [r5, #210]	@ zero_extendqisi2
+ 238:Src/main.c    ****                 status = VL6180x_RangeGetMeasurementIfReady(dev, &Range[i]);
+ 950              		.loc 1 238 15 view .LVU278
+ 951 0164 13F0020F 		tst	r3, #2
+ 952 0168 EED1     		bne	.L46
+ 239:Src/main.c    ****                 if (i==0)
+ 953              		.loc 1 239 17 is_stmt 1 view .LVU279
+ 239:Src/main.c    ****                 if (i==0)
+ 954              		.loc 1 239 26 is_stmt 0 view .LVU280
+ 955 016a 04EB8401 		add	r1, r4, r4, lsl #2
+ 956 016e 164B     		ldr	r3, .L60+8
+ 957 0170 03EBC101 		add	r1, r3, r1, lsl #3
+ 958 0174 2846     		mov	r0, r5
+ 959 0176 FFF7FEFF 		bl	VL6180x_RangeGetMeasurementIfReady
+ 960              	.LVL67:
+ 961 017a 8646     		mov	lr, r0
+ 962              	.LVL68:
+ 240:Src/main.c    ****                   RangeDB1 = Range[i];
+ 963              		.loc 1 240 17 is_stmt 1 view .LVU281
+ 240:Src/main.c    ****                   RangeDB1 = Range[i];
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 29
+
+
+ 964              		.loc 1 240 20 is_stmt 0 view .LVU282
+ 965 017c 002C     		cmp	r4, #0
+ 966 017e BFD0     		beq	.L57
+ 967              	.LVL69:
+ 968              	.L47:
+ 242:Src/main.c    ****                   RangeDB2 = Range[i];
+ 969              		.loc 1 242 17 is_stmt 1 view .LVU283
+ 242:Src/main.c    ****                   RangeDB2 = Range[i];
+ 970              		.loc 1 242 20 is_stmt 0 view .LVU284
+ 971 0180 012C     		cmp	r4, #1
+ 972 0182 CFD0     		beq	.L58
+ 973              	.L48:
+ 244:Src/main.c    ****                     if(Range[i].errorStatus == DataNotReady)
+ 974              		.loc 1 244 17 is_stmt 1 view .LVU285
+ 244:Src/main.c    ****                     if(Range[i].errorStatus == DataNotReady)
+ 975              		.loc 1 244 19 is_stmt 0 view .LVU286
+ 976 0184 BEF1000F 		cmp	lr, #0
+ 977 0188 DED1     		bne	.L46
+ 245:Src/main.c    ****                         continue;
+ 978              		.loc 1 245 21 is_stmt 1 view .LVU287
+ 245:Src/main.c    ****                         continue;
+ 979              		.loc 1 245 32 is_stmt 0 view .LVU288
+ 980 018a 04EB8403 		add	r3, r4, r4, lsl #2
+ 981 018e 0E4A     		ldr	r2, .L60+8
+ 982 0190 02EBC303 		add	r3, r2, r3, lsl #3
+ 983 0194 9B68     		ldr	r3, [r3, #8]
+ 245:Src/main.c    ****                         continue;
+ 984              		.loc 1 245 23 view .LVU289
+ 985 0196 122B     		cmp	r3, #18
+ 986 0198 D6D0     		beq	.L46
+ 248:Src/main.c    ****                     nReady++;
+ 987              		.loc 1 248 21 is_stmt 1 view .LVU290
+ 248:Src/main.c    ****                     nReady++;
+ 988              		.loc 1 248 31 is_stmt 0 view .LVU291
+ 989 019a 95F8D230 		ldrb	r3, [r5, #210]	@ zero_extendqisi2
+ 990 019e 43F00203 		orr	r3, r3, #2
+ 991 01a2 85F8D230 		strb	r3, [r5, #210]
+ 249:Src/main.c    ****                 } else {
+ 992              		.loc 1 249 21 is_stmt 1 view .LVU292
+ 249:Src/main.c    ****                 } else {
+ 993              		.loc 1 249 27 is_stmt 0 view .LVU293
+ 994 01a6 08F10108 		add	r8, r8, #1
+ 995              	.LVL70:
+ 249:Src/main.c    ****                 } else {
+ 996              		.loc 1 249 27 view .LVU294
+ 997 01aa CDE7     		b	.L46
+ 998              	.LVL71:
+ 999              	.L56:
+ 256:Src/main.c    ****     
+ 1000              		.loc 1 256 10 is_stmt 1 view .LVU295
+ 256:Src/main.c    ****     
+ 1001              		.loc 1 256 5 is_stmt 0 view .LVU296
+ 1002 01ac 4645     		cmp	r6, r8
+ 1003 01ae 01DD     		ble	.L59
+ 1004              	.LVL72:
+ 1005              	.L50:
+ 234:Src/main.c    ****         //DISP_ExecLoopBody();
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 30
+
+
+ 1006              		.loc 1 234 5 is_stmt 1 view .LVU297
+ 236:Src/main.c    ****             dev =  BoardDevs + PresentDevIds[i];
+ 1007              		.loc 1 236 9 view .LVU298
+ 236:Src/main.c    ****             dev =  BoardDevs + PresentDevIds[i];
+ 1008              		.loc 1 236 15 is_stmt 0 view .LVU299
+ 1009 01b0 0024     		movs	r4, #0
+ 236:Src/main.c    ****             dev =  BoardDevs + PresentDevIds[i];
+ 1010              		.loc 1 236 9 view .LVU300
+ 1011 01b2 CAE7     		b	.L45
+ 1012              	.LVL73:
+ 1013              	.L59:
+ 258:Src/main.c    ****       
+ 1014              		.loc 1 258 5 is_stmt 1 view .LVU301
+ 1015 01b4 0A20     		movs	r0, #10
+ 1016 01b6 FFF7FEFF 		bl	HAL_Delay
+ 1017              	.LVL74:
+ 1018              	.LBE10:
+ 217:Src/main.c    ****   {
+ 1019              		.loc 1 217 9 view .LVU302
+ 1020              	.L51:
+ 217:Src/main.c    ****   {
+ 1021              		.loc 1 217 3 view .LVU303
+ 1022              	.LBB11:
+ 219:Src/main.c    ****     
+ 1023              		.loc 1 219 5 view .LVU304
+ 222:Src/main.c    ****         dev =  BoardDevs + PresentDevIds[i];
+ 1024              		.loc 1 222 5 view .LVU305
+ 222:Src/main.c    ****         dev =  BoardDevs + PresentDevIds[i];
+ 1025              		.loc 1 222 11 is_stmt 0 view .LVU306
+ 1026 01ba 0025     		movs	r5, #0
+ 222:Src/main.c    ****         dev =  BoardDevs + PresentDevIds[i];
+ 1027              		.loc 1 222 5 view .LVU307
+ 1028 01bc 9BE7     		b	.L43
+ 1029              	.L61:
+ 1030 01be 00BF     		.align	2
+ 1031              	.L60:
+ 1032 01c0 00000240 		.word	1073872896
+ 1033 01c4 00000000 		.word	.LANCHOR0
+ 1034 01c8 00000000 		.word	Range
+ 1035 01cc 00000000 		.word	RangeDB1
+ 1036 01d0 00000000 		.word	RangeDB2
+ 1037              	.LBE11:
+ 1038              		.cfi_endproc
+ 1039              	.LFE133:
+ 1041              		.section	.text.Error_Handler,"ax",%progbits
+ 1042              		.align	1
+ 1043              		.global	Error_Handler
+ 1044              		.syntax unified
+ 1045              		.thumb
+ 1046              		.thumb_func
+ 1047              		.fpu fpv4-sp-d16
+ 1049              	Error_Handler:
+ 1050              	.LFB138:
+ 411:Src/main.c    **** 
+ 412:Src/main.c    **** /* USER CODE BEGIN 4 */
+ 413:Src/main.c    **** 
+ 414:Src/main.c    **** /* USER CODE END 4 */
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 31
+
+
+ 415:Src/main.c    **** 
+ 416:Src/main.c    **** /**
+ 417:Src/main.c    ****   * @brief  This function is executed in case of error occurrence.
+ 418:Src/main.c    ****   * @retval None
+ 419:Src/main.c    ****   */
+ 420:Src/main.c    **** void Error_Handler(void)
+ 421:Src/main.c    **** {
+ 1051              		.loc 1 421 1 is_stmt 1 view -0
+ 1052              		.cfi_startproc
+ 1053              		@ args = 0, pretend = 0, frame = 0
+ 1054              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1055              		@ link register save eliminated.
+ 422:Src/main.c    ****   /* USER CODE BEGIN Error_Handler_Debug */
+ 423:Src/main.c    ****   /* User can add his own implementation to report the HAL error return state */
+ 424:Src/main.c    **** 
+ 425:Src/main.c    ****   /* USER CODE END Error_Handler_Debug */
+ 426:Src/main.c    **** }
+ 1056              		.loc 1 426 1 view .LVU309
+ 1057 0000 7047     		bx	lr
+ 1058              		.cfi_endproc
+ 1059              	.LFE138:
+ 1061              		.global	BoardDevs
+ 1062              		.global	theVL6180xDev
+ 1063              		.comm	RangeDB2,40,4
+ 1064              		.comm	RangeDB1,40,4
+ 1065              		.comm	Range,80,4
+ 1066              		.comm	huart2,64,4
+ 1067              		.comm	hi2c1,84,4
+ 1068              		.section	.data.BoardDevs,"aw"
+ 1069              		.align	2
+ 1070              		.set	.LANCHOR0,. + 0
+ 1073              	BoardDevs:
+ 1074 0000 00000000 		.space	209
+ 1074      00000000 
+ 1074      00000000 
+ 1074      00000000 
+ 1074      00000000 
+ 1075 00d1 00       		.byte	0
+ 1076 00d2 0000     		.space	2
+ 1077 00d4 00000000 		.space	209
+ 1077      00000000 
+ 1077      00000000 
+ 1077      00000000 
+ 1077      00000000 
+ 1078 01a5 01       		.byte	1
+ 1079 01a6 0000     		.space	2
+ 1080              		.section	.data.theVL6180xDev,"aw"
+ 1081              		.align	2
+ 1084              	theVL6180xDev:
+ 1085 0000 00000000 		.word	BoardDevs
+ 1086              		.text
+ 1087              	.Letext0:
+ 1088              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\9 2020-q2-update\\arm-none-eabi\\inc
+ 1089              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\9 2020-q2-update\\arm-none-eabi\\inc
+ 1090              		.file 4 "Drivers/CMSIS/Include/core_cm4.h"
+ 1091              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h"
+ 1092              		.file 6 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h"
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 32
+
+
+ 1093              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 1094              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h"
+ 1095              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h"
+ 1096              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
+ 1097              		.file 11 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 1098              		.file 12 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h"
+ 1099              		.file 13 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h"
+ 1100              		.file 14 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h"
+ 1101              		.file 15 "c:\\program files (x86)\\gnu arm embedded toolchain\\9 2020-q2-update\\arm-none-eabi\\in
+ 1102              		.file 16 "Inc/vl6180x_def.h"
+ 1103              		.file 17 "Inc/vl6180x_platform.h"
+ 1104              		.file 18 "Inc/vl6180x_api.h"
+ 1105              		.file 19 "<built-in>"
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 33
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:18     .text.MX_GPIO_Init:00000000 $t
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:25     .text.MX_GPIO_Init:00000000 MX_GPIO_Init
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:165    .text.MX_GPIO_Init:000000a0 $d
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:173    .text.MX_I2C1_Init:00000000 $t
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:179    .text.MX_I2C1_Init:00000000 MX_I2C1_Init
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:231    .text.MX_I2C1_Init:00000028 $d
+                            *COM*:00000054 hi2c1
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:238    .text.MX_USART2_UART_Init:00000000 $t
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:244    .text.MX_USART2_UART_Init:00000000 MX_USART2_UART_Init
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:293    .text.MX_USART2_UART_Init:00000024 $d
+                            *COM*:00000040 huart2
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:299    .text.VL6180x_I2CWrite:00000000 $t
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:306    .text.VL6180x_I2CWrite:00000000 VL6180x_I2CWrite
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:381    .text.VL6180x_I2CWrite:00000034 $d
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:386    .text.VL6180x_I2CRead:00000000 $t
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:393    .text.VL6180x_I2CRead:00000000 VL6180x_I2CRead
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:468    .text.VL6180x_I2CRead:00000034 $d
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:473    .text.WaitMilliSec:00000000 $t
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:480    .text.WaitMilliSec:00000000 WaitMilliSec
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:502    .text.SystemClock_Config:00000000 $t
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:509    .text.SystemClock_Config:00000000 SystemClock_Config
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:646    .text.SystemClock_Config:0000008c $d
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:652    .text.main:00000000 $t
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:659    .text.main:00000000 main
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:1032   .text.main:000001c0 $d
+                            *COM*:00000050 Range
+                            *COM*:00000028 RangeDB1
+                            *COM*:00000028 RangeDB2
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:1042   .text.Error_Handler:00000000 $t
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:1049   .text.Error_Handler:00000000 Error_Handler
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:1073   .data.BoardDevs:00000000 BoardDevs
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:1084   .data.theVL6180xDev:00000000 theVL6180xDev
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:1069   .data.BoardDevs:00000000 $d
+C:\Users\asafw\AppData\Local\Temp\cc260g2D.s:1081   .data.theVL6180xDev:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin
+HAL_GPIO_Init
+HAL_I2C_Init
+HAL_UART_Init
+HAL_I2C_Master_Transmit
+HAL_I2C_MspInit
+HAL_I2C_Master_Receive
+HAL_Delay
+memset
+HAL_RCC_OscConfig
+HAL_RCC_ClockConfig
+HAL_Init
+HAL_GPIO_TogglePin
+VL6180x_RdByte
+VL6180x_Prepare
+VL6180x_DMaxSetState
+VL6180x_InitData
+VL6180x_SetI2CAddress
+VL6180x_RangeStartSingleShot
+ARM GAS  C:\Users\asafw\AppData\Local\Temp\cc260g2D.s 			page 34
+
+
+VL6180x_RangeGetMeasurementIfReady
